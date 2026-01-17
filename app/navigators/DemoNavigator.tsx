@@ -1,20 +1,50 @@
-import { TextStyle, ViewStyle } from "react-native"
+import { TextStyle, ViewStyle, View } from "react-native"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { useIsFocused } from "@react-navigation/native"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { Icon } from "@/components/Icon"
 import { EpisodeProvider } from "@/context/EpisodeContext"
 import { translate } from "@/i18n/translate"
-import { DemoCommunityScreen } from "@/screens/DemoCommunityScreen"
 import { DemoDebugScreen } from "@/screens/DemoDebugScreen"
 import { DemoPodcastListScreen } from "@/screens/DemoPodcastListScreen"
-import { DemoShowroomScreen } from "@/screens/DemoShowroomScreen/DemoShowroomScreen"
-import type { ThemedStyle } from "@/theme/types"
+import { FoodGridScreen } from "@/screens/FoodGridScreen"
+import { WelcomeScreen } from "@/screens/WelcomeScreen"
 import { useAppTheme } from "@/theme/context"
+import type { ThemedStyle } from "@/theme/types"
 
 import type { DemoTabParamList } from "./navigationTypes"
+import { DemoShowroomScreen } from "@/screens/DemoShowroomScreen/DemoShowroomScreen"
 
 const Tab = createBottomTabNavigator<DemoTabParamList>()
+
+const withFade = (Component: React.ComponentType<any>) => {
+  const WrappedComponent = (props: any) => {
+    const isFocused = useIsFocused()
+    return (
+      <View style={$container}>
+        {isFocused && (
+          <Animated.View
+            entering={FadeIn.duration(100)}
+            exiting={FadeOut.duration(100)}
+            style={$container}
+          >
+            <Component {...props} />
+          </Animated.View>
+        )}
+      </View>
+    )
+  }
+  WrappedComponent.displayName = `withFade(${Component.displayName || Component.name})`
+  return WrappedComponent
+}
+
+const WelcomeScreenFade = withFade(WelcomeScreen)
+const FoodGridScreenFade = withFade(FoodGridScreen)
+const DemoPodcastListScreenFade = withFade(DemoPodcastListScreen)
+const DemoDebugScreenFade = withFade(DemoDebugScreen)
 
 /**
  * This is the main navigator for the demo screens with a bottom tab bar.
@@ -36,13 +66,14 @@ export function DemoNavigator() {
         screenOptions={{
           headerShown: false,
           tabBarHideOnKeyboard: true,
-          tabBarStyle: themed([$tabBar, { height: bottom + 70 }]),
+          tabBarStyle: themed([$tabBar, { height: bottom + 60, paddingBottom: bottom }]),
           tabBarActiveTintColor: colors.text,
           tabBarInactiveTintColor: colors.text,
           tabBarLabelStyle: themed($tabBarLabel),
           tabBarItemStyle: themed($tabBarItem),
         }}
       >
+
         <Tab.Screen
           name="DemoShowroom"
           component={DemoShowroomScreen}
@@ -59,13 +90,13 @@ export function DemoNavigator() {
         />
 
         <Tab.Screen
-          name="DemoCommunity"
-          component={DemoCommunityScreen}
+          name="FoodGrid"
+          component={FoodGridScreenFade}
           options={{
-            tabBarLabel: translate("demoNavigator:communityTab"),
+            tabBarLabel: "Safe Foods",
             tabBarIcon: ({ focused }) => (
-              <Icon
-                icon="community"
+              <MaterialCommunityIcons
+                name="food-apple"
                 color={focused ? colors.tint : colors.tintInactive}
                 size={30}
               />
@@ -75,7 +106,7 @@ export function DemoNavigator() {
 
         <Tab.Screen
           name="DemoPodcastList"
-          component={DemoPodcastListScreen}
+          component={DemoPodcastListScreenFade}
           options={{
             tabBarAccessibilityLabel: translate("demoNavigator:podcastListTab"),
             tabBarLabel: translate("demoNavigator:podcastListTab"),
@@ -87,7 +118,7 @@ export function DemoNavigator() {
 
         <Tab.Screen
           name="DemoDebug"
-          component={DemoDebugScreen}
+          component={DemoDebugScreenFade}
           options={{
             tabBarLabel: translate("demoNavigator:debugTab"),
             tabBarIcon: ({ focused }) => (
@@ -101,17 +132,22 @@ export function DemoNavigator() {
 }
 
 const $tabBar: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  borderTopWidth: 1,
   backgroundColor: colors.background,
-  borderTopColor: colors.transparent,
+  borderTopColor: colors.separator,
 })
 
 const $tabBarItem: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  paddingTop: spacing.md,
+  paddingTop: spacing.xxs,
 })
 
 const $tabBarLabel: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
-  fontSize: 12,
+  fontSize: 10,
   fontFamily: typography.primary.medium,
-  lineHeight: 16,
+  lineHeight: 12,
   color: colors.text,
 })
+
+const $container: ViewStyle = {
+  flex: 1,
+}

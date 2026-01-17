@@ -17,6 +17,7 @@ import { useAppTheme } from "@/theme/context"
 import { DemoNavigator } from "./DemoNavigator"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import type { AppStackParamList, NavigationProps } from "./navigationTypes"
+import React from "react"
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -42,13 +43,13 @@ const AppStack = () => {
         contentStyle: {
           backgroundColor: colors.background,
         },
+        animation: "fade",
+        animationDuration: 50,
       }}
-      initialRouteName={isAuthenticated ? "Welcome" : "Login"}
+      initialRouteName={isAuthenticated ? "Demo" : "Login"}
     >
       {isAuthenticated ? (
         <>
-          <Stack.Screen name="Welcome" component={WelcomeScreen} />
-
           <Stack.Screen name="Demo" component={DemoNavigator} />
         </>
       ) : (
