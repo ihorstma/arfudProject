@@ -11,6 +11,25 @@ module.exports = {
     "plugin:react/jsx-runtime",
     "prettier",
   ],
+  settings: {
+    "import/ignore": ["react-native"],
+    "import/resolver": {
+      node: {
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+      },
+      typescript: {
+        project: "./tsconfig.json",
+        alwaysTryTypes: true,
+      },
+      alias: {
+        map: [
+          ["@", "."],
+          ["@/", "./"],
+        ],
+        extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
+      },
+    },
+  },
   plugins: ["reactotron", "prettier"],
   rules: {
     "prettier/prettier": "error",

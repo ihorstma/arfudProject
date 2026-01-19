@@ -1,0 +1,323 @@
+import { ComponentType, useEffect, useMemo, useRef, useState } from "react"
+// eslint-disable-next-line no-restricted-imports
+import { Alert, Image, ImageStyle, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import { useRouter } from "expo-router"
+import { Ionicons } from "@expo/vector-icons"
+
+import { Button } from "@/components/Button"
+import { PressableIcon } from "@/components/Icon"
+import { Screen } from "@/components/Screen"
+import { Text } from "@/components/Text"
+import { TextField, type TextFieldAccessoryProps } from "@/components/TextField"
+import { useAuth } from "@/context/AuthContext"
+import { authClient } from "@/services/auth-client"
+import { useAppTheme } from "@/theme/context"
+import type { ThemedStyle } from "@/theme/types"
+
+export default function LoginScreen() {
+  const authPasswordInput = useRef<TextInput>(null)
+  const router = useRouter()
+
+  const [authPassword, setAuthPassword] = useState("")
+  const [authEmail, setAuthEmail] = useState("")
+  const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [attemptsCount, setAttemptsCount] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const { isAuthenticated } = useAuth()
+
+  const {
+    themed,
+    theme: { colors, spacing },
+  } = useAppTheme()
+
+  const validationError = useMemo(() => {
+    if (!authEmail || authEmail.length === 0) return "can't be blank"
+    if (authEmail.length < 6) return "must be at least 6 characters"
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(authEmail)) return "must be a valid email address"
+    return ""
+  }, [authEmail])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/(demo)/showroom")
+    }
+  }, [isAuthenticated, router])
+
+  const error = isSubmitted ? validationError : ""
+
+  async function login() {
+    setIsSubmitted(true)
+    setAttemptsCount(attemptsCount + 1)
+
+    if (validationError) return
+
+    setIsLoading(true)
+
+    const { error } = await authClient.signIn.email({
+      email: authEmail,
+      password: authPassword,
+    })
+
+    setIsLoading(false)
+
+    if (error) {
+      Alert.alert("Login Failed", error.message || "Something went wrong")
+    } else {
+      setIsSubmitted(false)
+      setAuthPassword("")
+      router.replace("/(demo)/showroom")
+    }
+  }
+
+  const PasswordRightAccessory: ComponentType<TextFieldAccessoryProps> = useMemo(
+    () =>
+      function PasswordRightAccessory(props: TextFieldAccessoryProps) {
+        return (
+          <PressableIcon
+            icon={isAuthPasswordHidden ? "view" : "hidden"}
+            color={colors.palette.neutral900}
+            containerStyle={props.style}
+            size={20}
+            onPress={() => setIsAuthPasswordHidden(!isAuthPasswordHidden)}
+          />
+        )
+      },
+    [isAuthPasswordHidden, colors.palette.neutral900],
+  )
+
+  return (
+    <Screen
+      preset="auto"
+      contentContainerStyle={themed($screenContentContainer)}
+      safeAreaEdges={["top", "bottom"]}
+    >
+      <View style={themed($logoContainer)}>
+        <Image source={require("@assets/icons/logo.png")} style={themed($logo)} />
+      </View>
+      
+      {attemptsCount > 2 && (
+        <Text tx="loginScreen:hint" size="sm" weight="light" style={themed($hint)} />
+      )}
+
+      <TextField
+        value={authEmail}
+        onChangeText={setAuthEmail}
+        label="Email"
+        autoCapitalize="none"
+        autoComplete="email"
+        autoCorrect={false}
+        keyboardType="email-address"
+        helper={error}
+        status={error ? "error" : undefined}
+        inputWrapperStyle={themed($authKitInputWrapper)}
+        style={themed($authKitInput)}
+        LabelTextProps={{ style: themed($authKitLabel) }}
+        containerStyle={themed($textFieldContainer)}
+        onSubmitEditing={() => authPasswordInput.current?.focus()}
+        textAlignVertical="center"
+      />
+
+      <TextField
+        ref={authPasswordInput}
+        value={authPassword}
+        onChangeText={setAuthPassword}
+        label="Password"
+        autoCapitalize="none"
+        autoComplete="password"
+        autoCorrect={false}
+        secureTextEntry={isAuthPasswordHidden}
+        inputWrapperStyle={themed($authKitInputWrapper)}
+        style={themed($authKitInput)}
+        LabelTextProps={{ style: themed($authKitLabel) }}
+        containerStyle={themed($textFieldContainer)}
+        onSubmitEditing={login}
+        RightAccessory={PasswordRightAccessory}
+        textAlignVertical="center"
+      />
+
+      <Button
+        testID="login-button"
+        text="Sign-in"
+        style={themed($authKitButton)}
+        textStyle={themed($authKitButtonText)}
+        pressedStyle={themed($authKitButtonPressed)}
+        onPress={login}
+        disabled={isLoading}
+      />
+
+      {/* Divider */}
+      <View style={themed($dividerContainer)}>
+        <View style={themed($dividerLine)} />
+        <Text text="or" size="xs" style={themed($dividerText)} />
+        <View style={themed($dividerLine)} />
+      </View>
+
+      {/* Social Logins */}
+      <Button
+        text="Continue with Google"
+        style={themed($authKitSocialButton)}
+        textStyle={themed($authKitButtonText)}
+        pressedStyle={themed($authKitButtonPressed)}
+        LeftAccessory={(props) => (
+          <View style={[props.style, themed($iconSpacing)]}>
+             <Ionicons name="logo-google" size={20} color={colors.palette.neutral100} />
+          </View>
+        )}
+        onPress={() =>
+          authClient.signIn.social({
+            provider: "google",
+            callbackURL: "arfud://(demo)/showroom",
+          })
+        }
+      />
+
+      <Button
+        text="Continue with Apple"
+        style={themed($authKitSocialButton)}
+        textStyle={themed($authKitButtonText)}
+        pressedStyle={themed($authKitButtonPressed)}
+        LeftAccessory={(props) => (
+          <View style={[props.style, themed($iconSpacing)]}>
+            <Ionicons name="logo-apple" size={20} color={colors.palette.neutral100} />
+          </View>
+        )}
+        onPress={() =>
+          authClient.signIn.social({
+            provider: "apple",
+            callbackURL: "arfud://(demo)/showroom",
+          })
+        }
+      />
+
+      <Button
+        text="Don't have an account? Sign up"
+        style={themed($linkButton)}
+        textStyle={themed($linkButtonText)}
+        onPress={() => router.push("/register")}
+      />
+    </Screen>
+  )
+}
+
+const $screenContentContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  paddingVertical: spacing.xxl,
+  paddingHorizontal: spacing.lg,
+  alignItems: "stretch",
+})
+
+const $logoContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  alignItems: "center"
+})
+
+const $logo: ThemedStyle<ImageStyle> = () => ({
+  height: 300,
+  width: "100%",
+  resizeMode: "contain",
+})
+
+const $heading: ThemedStyle<TextStyle> = ({ spacing }) => ({
+  marginBottom: spacing.lg,
+  textAlign: "center",
+  fontSize: 32,
+})
+
+const $hint: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+  color: colors.tint,
+  marginBottom: spacing.md,
+  textAlign: "center",
+})
+
+const $textFieldContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginBottom: spacing.lg,
+})
+
+const $authKitInputWrapper: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  borderWidth: 2,
+  borderColor: colors.palette.neutral900,
+  borderRadius: 4,
+  backgroundColor: colors.palette.neutral100,
+  height: 48,
+  alignItems: "center",
+  justifyContent: "center",
+  overflow: "hidden",
+})
+
+const $authKitInput: ThemedStyle<TextStyle> = ({ typography }) => ({
+  fontFamily: typography.primary.normal,
+  fontSize: 20,
+  flex: 1, // Allow input to fill the wrapper height
+  paddingHorizontal: 12,
+  marginVertical: 0,
+  marginHorizontal: 0,
+  paddingVertical: 0,
+})
+
+const $authKitLabel: ThemedStyle<TextStyle> = ({ spacing }) => ({
+  fontSize: 16,
+  fontWeight: "bold",
+  marginBottom: spacing.xs,
+})
+
+const $authKitButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  backgroundColor: colors.palette.neutral900,
+  borderRadius: 4,
+  height: 48,
+  borderWidth: 0,
+  marginTop: 8,
+  marginBottom: 8,
+})
+
+const $authKitSocialButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  backgroundColor: colors.palette.neutral900,
+  borderRadius: 4,
+  height: 48,
+  borderWidth: 0,
+  marginTop: 8,
+  marginBottom: 8,
+})
+
+const $authKitButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  color: colors.palette.neutral100,
+  fontSize: 20,
+  fontFamily: typography.primary.normal,
+})
+
+const $authKitButtonPressed: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  backgroundColor: "#333333",
+})
+
+const $iconSpacing: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginEnd: spacing.sm,
+})
+
+const $linkButton: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginTop: spacing.md,
+  backgroundColor: "transparent",
+  borderWidth: 0,
+  alignSelf: "center",
+})
+
+const $linkButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
+  color: colors.text,
+  textDecorationLine: "underline",
+  fontSize: 16,
+})
+
+const $dividerContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  alignItems: "center",
+  marginVertical: spacing.lg,
+})
+
+const $dividerLine: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  flex: 1,
+  height: 1,
+  backgroundColor: colors.palette.neutral300,
+})
+
+const $dividerText: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+  marginHorizontal: spacing.sm,
+  color: colors.textDim,
+})

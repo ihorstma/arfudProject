@@ -28,7 +28,7 @@
     "bundleIdentifier": "com.arfud"
   },
   "web": {
-    "favicon": "./assets/images/app-icon-web-favicon.png",
+    "favicon": "./assets/icons/logo.png",
     "bundler": "metro"
   },
   "plugins": [
@@ -36,10 +36,11 @@
     "expo-font",
     "expo-web-browser",
     "expo-secure-store",
+    "expo-router",
     [
       "expo-splash-screen",
       {
-        "image": "./assets/images/app-icon-android-adaptive-foreground.png",
+        "image": "./assets/icons/logo.png",
         "imageWidth": 300,
         "resizeMode": "contain",
         "backgroundColor": "#191015"
