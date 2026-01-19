@@ -24,6 +24,7 @@ import * as Linking from "expo-linking"
 import { KeyboardProvider } from "react-native-keyboard-controller"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 
+import { ConvexClientProvider } from "./ConvexClientProvider"
 import { AuthProvider } from "./context/AuthContext"
 import { initI18n } from "./i18n"
 import { AppNavigator } from "./navigators/AppNavigator"
@@ -96,15 +97,17 @@ export function App() {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <KeyboardProvider>
-        <AuthProvider>
-          <ThemeProvider>
-            <AppNavigator
-              linking={linking}
-              initialState={initialNavigationState}
-              onStateChange={onNavigationStateChange}
-            />
-          </ThemeProvider>
-        </AuthProvider>
+        <ConvexClientProvider>
+          <AuthProvider>
+            <ThemeProvider>
+              <AppNavigator
+                linking={linking}
+                initialState={initialNavigationState}
+                onStateChange={onNavigationStateChange}
+              />
+            </ThemeProvider>
+          </AuthProvider>
+        </ConvexClientProvider>
       </KeyboardProvider>
     </SafeAreaProvider>
   )
