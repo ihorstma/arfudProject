@@ -1,6 +1,6 @@
 import { ComponentType, useEffect, useMemo, useRef, useState } from "react"
 // eslint-disable-next-line no-restricted-imports
-import { Alert, Image, ImageStyle, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import { Image, ImageStyle, TextInput, TextStyle, View, ViewStyle } from "react-native"
 import { useRouter } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 
@@ -13,10 +13,12 @@ import { useAuth } from "@/context/AuthContext"
 import { authClient } from "@/services/auth-client"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
+import { useCustomAlert } from "@/components/CustomAlert"
 
 export default function LoginScreen() {
   const authPasswordInput = useRef<TextInput>(null)
   const router = useRouter()
+  const { showAlert } = useCustomAlert()
 
   const [authPassword, setAuthPassword] = useState("")
   const [authEmail, setAuthEmail] = useState("")
@@ -63,7 +65,7 @@ export default function LoginScreen() {
     setIsLoading(false)
 
     if (error) {
-      Alert.alert("Login Failed", error.message || "Something went wrong")
+      showAlert("Login Failed", error.message || "Something went wrong")
     } else {
       setIsSubmitted(false)
       setAuthPassword("")

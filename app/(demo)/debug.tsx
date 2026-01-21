@@ -42,6 +42,7 @@ export default function DemoDebugScreen() {
   const demoReactotron = useMemo(
     () => async () => {
       if (__DEV__) {
+        // @ts-ignore
         console.tron.display({
           name: "DISPLAY",
           value: {

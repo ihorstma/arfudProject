@@ -1,76 +1,66 @@
-import { useState } from "react"
-import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
+import { useMemo, useState } from "react"
+import {
+  Image,
+  ImageStyle,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+  Pressable,
+} from "react-native"
+import { useRouter } from "expo-router"
 import { FlashList } from "@shopify/flash-list"
 import { Searchbar } from "react-native-paper"
+import { useQuery } from "convex/react"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
 
+import { api } from "@/convex/_generated/api"
+import type { Doc } from "@/convex/_generated/dataModel"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { useAppTheme } from "@/theme/context"
 import { $styles } from "@/theme/styles"
 import type { ThemedStyle } from "@/theme/types"
 
-interface FoodItem {
-  id: string
-  label: string
-  height: number
-  image: string
+const getRandomHeight = (id: string) => {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash << 5) - hash + id.charCodeAt(i)
+    hash |= 0
+  }
+  return 180 + (Math.abs(hash) % 140) // 180 to 320
 }
 
-const FOOD_ITEMS: FoodItem[] = [
-  {
-    id: "1",
-    label: "Frozen Watermelon",
-    height: 220,
-    image: "https://loremflickr.com/300/220/watermelon",
-  },
-  {
-    id: "2",
-    label: "Prosciutto",
-    height: 300,
-    image: "https://loremflickr.com/300/300/prosciutto",
-  },
-  {
-    id: "3",
-    label: "Avocado Toast",
-    height: 200,
-    image: "https://loremflickr.com/300/200/avocado",
-  },
-  {
-    id: "4",
-    label: "Blueberry Smoothie",
-    height: 260,
-    image: "https://loremflickr.com/300/260/smoothie",
-  },
-  {
-    id: "5",
-    label: "Grilled Salmon",
-    height: 240,
-    image: "https://loremflickr.com/300/240/salmon",
-  },
-  { id: "6", label: "Caesar Salad", height: 180, image: "https://loremflickr.com/300/180/salad" },
-  { id: "7", label: "Chocolate Cake", height: 280, image: "https://loremflickr.com/300/280/cake" },
-  { id: "8", label: "Iced Coffee", height: 320, image: "https://loremflickr.com/300/320/coffee" },
-  { id: "9", label: "Sushi Platter", height: 210, image: "https://loremflickr.com/300/210/sushi" },
-  { id: "10", label: "Mango Salsa", height: 190, image: "https://loremflickr.com/300/190/mango" },
-]
-
 export default function FoodGridScreen() {
+  const router = useRouter()
   const { themed, theme } = useAppTheme()
   const [searchQuery, setSearchQuery] = useState("")
 
-  const filteredData = FOOD_ITEMS.filter((item) =>
-    item.label.toLowerCase().includes(searchQuery.toLowerCase()),
+  const rawFoods = useQuery(api.foods.listFoods, { includeUnsafe: false }) ?? []
+
+  const foods = useMemo(() => {
+    return rawFoods.map((item: any) => ({
+      ...item,
+      height: getRandomHeight(item._id),
+    }))
+  }, [rawFoods])
+
+  const filteredData = foods.filter((item: any) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
-  const renderItem = ({ item }: { item: FoodItem }) => (
-    <View style={themed($itemContainer)}>
+  const renderItem = ({ item }: { item: Doc<"foods"> & { height: number } }) => (
+    <Pressable
+      style={themed($itemContainer)}
+      onPress={() => router.push(`/safe-foods/${item._id}`)}
+    >
       <Image
-        source={{ uri: item.image }}
+        source={{ uri: item.imageUrl || "https://loremflickr.com/300/300/food" }}
         style={[themed($image), { height: item.height }]}
         resizeMode="cover"
       />
-      <Text style={themed($label)}>{item.label}</Text>
-    </View>
+      <Text style={themed($label)}>{item.name}</Text>
+    </Pressable>
   )
 
   return (
@@ -80,25 +70,42 @@ export default function FoodGridScreen() {
       contentContainerStyle={$styles.flex1}
       style={{ backgroundColor: theme.colors.palette.neutral100 }}
     >
-      <Searchbar
-        placeholder="Search safe foods"
-        onChangeText={setSearchQuery}
-        value={searchQuery}
-        style={themed($searchBar)}
-        inputStyle={themed($searchInput)}
-        iconColor={theme.colors.palette.neutral500}
-        placeholderTextColor={theme.colors.palette.neutral500}
-        elevation={0}
-      />
+      <View style={themed($header)}>
+        <View style={themed($headerRow)}>
+          <Text preset="heading" text="Safe Foods" />
+        </View>
+        <Searchbar
+          placeholder="Search safe foods"
+          onChangeText={setSearchQuery}
+          value={searchQuery}
+          style={themed($searchBar)}
+          inputStyle={themed($searchInput)}
+          iconColor={theme.colors.palette.neutral500}
+          placeholderTextColor={theme.colors.palette.neutral500}
+          elevation={0}
+        />
+      </View>
+
       <FlashList
         data={filteredData}
         numColumns={2}
         renderItem={renderItem}
+        // @ts-ignore
         masonry
         optimizeItemArrangement
+        // @ts-ignore
+        estimatedItemSize={200}
         contentContainerStyle={themed($listContent)}
         showsVerticalScrollIndicator={false}
       />
+
+      <TouchableOpacity
+        style={themed($fab)}
+        onPress={() => router.push("/safe-foods/create")}
+        activeOpacity={0.8}
+      >
+        <MaterialCommunityIcons name="plus" size={32} color={theme.colors.palette.neutral900} />
+      </TouchableOpacity>
     </Screen>
   )
 }
@@ -127,14 +134,46 @@ const $label: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   lineHeight: 20,
 })
 
+const $header: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  paddingHorizontal: spacing.md,
+  paddingTop: spacing.md,
+  gap: spacing.sm,
+})
+
+const $headerRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: spacing.sm,
+})
+
 const $searchBar: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   backgroundColor: colors.palette.neutral200,
   borderRadius: 12,
-  margin: spacing.md,
+  marginBottom: spacing.sm,
   elevation: 0,
 })
 
 const $searchInput: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.text,
-  minHeight: 0, // Fix for some paper versions with height issues
+  minHeight: 0,
+})
+
+const $fab: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  position: "absolute",
+  bottom: spacing.lg,
+  right: spacing.lg,
+  width: 56,
+  height: 56,
+  borderRadius: 28,
+  backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent white
+  justifyContent: "center",
+  alignItems: "center",
+  borderWidth: 1,
+  borderColor: "rgba(255, 255, 255, 0.9)",
+  shadowColor: colors.palette.neutral900,
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.2,
+  shadowRadius: 8,
+  elevation: 4,
 })

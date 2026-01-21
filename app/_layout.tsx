@@ -11,6 +11,8 @@ import { ThemeProvider } from "@/theme/context"
 import { customFontsToLoad } from "@/theme/typography"
 import { loadDateFnsLocale } from "@/utils/formatDate"
 
+import { CustomAlertProvider } from "@/components/CustomAlert"
+
 export default function RootLayout() {
   const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad)
   const [isI18nInitialized, setIsI18nInitialized] = useState(false)
@@ -31,11 +33,13 @@ export default function RootLayout() {
         <ConvexClientProvider>
           <AuthProvider>
             <ThemeProvider>
-              <Stack screenOptions={{ headerShown: false, animation: "fade", animationDuration: 30 }}>
-                <Stack.Screen name="index" />
-                <Stack.Screen name="login" />
-                <Stack.Screen name="(demo)" />
-              </Stack>
+              <CustomAlertProvider>
+                <Stack screenOptions={{ headerShown: false, animation: "fade", animationDuration: 30 }}>
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="login" />
+                  <Stack.Screen name="(demo)" />
+                </Stack>
+              </CustomAlertProvider>
             </ThemeProvider>
           </AuthProvider>
         </ConvexClientProvider>

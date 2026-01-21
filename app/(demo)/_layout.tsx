@@ -21,7 +21,6 @@ export default function DemoLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          animation: "fade",
           tabBarHideOnKeyboard: true,
           tabBarStyle: themed([$tabBar, { height: bottom + 60, paddingBottom: bottom }]),
           tabBarActiveTintColor: colors.text,
@@ -56,6 +55,11 @@ export default function DemoLayout() {
             ),
           }}
         />
+        <Tabs.Screen name="demos" options={{ href: null }} />
+        <Tabs.Screen name="DrawerIconButton" options={{ href: null }} />
+        <Tabs.Screen name="SectionListWithKeyboardAwareScrollView" options={{ href: null }} />
+        <Tabs.Screen name="DemoDivider" options={{ href: null }} />
+        <Tabs.Screen name="DemoUseCase" options={{ href: null }} />
         <Tabs.Screen
           name="podcast"
           options={{
