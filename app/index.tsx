@@ -3,6 +3,7 @@ import { Redirect } from "expo-router"
 import { useAuth } from "@/context/AuthContext"
 
 export default function Index() {
-  const { isAuthenticated } = useAuth()
-  return <Redirect href={isAuthenticated ? "/(demo)/showroom" : "/login"} />
+  const { isAuthenticated, isPending } = useAuth()
+  if (isPending) return null
+  return <Redirect href={isAuthenticated ? "/(demo)/food-grid" : "/login"} />
 }

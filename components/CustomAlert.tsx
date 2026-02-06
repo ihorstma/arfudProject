@@ -1,8 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from "react"
+import { type ReactNode, createContext, useContext, useState } from "react"
 import { Modal, View, ViewStyle, TextStyle, TouchableOpacity } from "react-native"
-import { Text } from "./Text"
+
 import { useAppTheme } from "@/theme/context"
 import { ThemedStyle } from "@/theme/types"
+
+import { Text } from "./Text"
 
 interface CustomAlertContextType {
   showAlert: (title: string, message: string, onOk?: () => void) => void
@@ -55,7 +57,7 @@ export const CustomAlertProvider = ({ children }: { children: ReactNode }) => {
   )
 }
 
-const $overlay: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $overlay: ThemedStyle<ViewStyle> = () => ({
   flex: 1,
   backgroundColor: "rgba(0, 0, 0, 0.5)",
   justifyContent: "center",

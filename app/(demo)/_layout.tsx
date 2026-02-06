@@ -3,9 +3,7 @@ import { Tabs } from "expo-router"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-import { Icon } from "@/components/Icon"
 import { EpisodeProvider } from "@/context/EpisodeContext"
-import { translate } from "@/i18n/translate"
 import { useAppTheme } from "@/theme/context"
 import { ThemedStyle } from "@/theme/types"
 
@@ -30,22 +28,10 @@ export default function DemoLayout() {
         }}
       >
         <Tabs.Screen
-          name="showroom"
-          options={{
-            tabBarLabel: translate("demoNavigator:componentsTab"),
-            tabBarIcon: ({ focused }) => (
-              <Icon
-                icon="components"
-                color={focused ? colors.tint : colors.tintInactive}
-                size={30}
-              />
-            ),
-          }}
-        />
-        <Tabs.Screen
           name="food-grid"
           options={{
-            tabBarLabel: "Safe Foods",
+            title: "Safe Foods",
+            tabBarLabel: "Foods",
             tabBarIcon: ({ focused }) => (
               <MaterialCommunityIcons
                 name="food-apple"
@@ -55,28 +41,36 @@ export default function DemoLayout() {
             ),
           }}
         />
-        <Tabs.Screen name="demos" options={{ href: null }} />
-        <Tabs.Screen name="DrawerIconButton" options={{ href: null }} />
-        <Tabs.Screen name="SectionListWithKeyboardAwareScrollView" options={{ href: null }} />
-        <Tabs.Screen name="DemoDivider" options={{ href: null }} />
-        <Tabs.Screen name="DemoUseCase" options={{ href: null }} />
+        <Tabs.Screen
+          name="showroom"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="safe-food-manager"
+          options={{
+            title: "Manage",
+            tabBarLabel: "Manage",
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons
+                name="view-grid-plus-outline"
+                color={focused ? colors.tint : colors.tintInactive}
+                size={30}
+              />
+            ),
+          }}
+        />
         <Tabs.Screen
           name="podcast"
           options={{
-            tabBarAccessibilityLabel: translate("demoNavigator:podcastListTab"),
-            tabBarLabel: translate("demoNavigator:podcastListTab"),
-            tabBarIcon: ({ focused }) => (
-              <Icon icon="podcast" color={focused ? colors.tint : colors.tintInactive} size={30} />
-            ),
+            href: null,
           }}
         />
         <Tabs.Screen
           name="debug"
           options={{
-            tabBarLabel: translate("demoNavigator:debugTab"),
-            tabBarIcon: ({ focused }) => (
-              <Icon icon="debug" color={focused ? colors.tint : colors.tintInactive} size={30} />
-            ),
+            href: null,
           }}
         />
       </Tabs>
