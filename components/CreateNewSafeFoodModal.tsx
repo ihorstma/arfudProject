@@ -193,6 +193,7 @@ const $closeIcon: ThemedStyle<ViewStyle> = () => ({
 
 const $field: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginBottom: spacing.xs,
+  color: "white",
 })
 
 const $tagContainer: ThemedStyle<ViewStyle> = () => ({ 
