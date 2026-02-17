@@ -1,6 +1,6 @@
 // the create a new safe food modal
 
-import { View, Modal, Pressable, ViewStyle} from "react-native"
+import { View, Modal, Pressable, ViewStyle, TextStyle} from "react-native"
 import { useRouter } from "expo-router"
 import { useMutation } from "convex/react"
 import { useState } from "react"
@@ -14,6 +14,7 @@ import { TextField } from "@/components/TextField"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 import { useCustomAlert } from "@/components/CustomAlert"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
 
 const availableTags = [
   "sweet",
@@ -111,9 +112,11 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
         <View style={themed($modal)}>
           
           {/* Header */}
-          <View style={themed($headerRow)}>
-            <PressableIcon icon="x" onPress={onClose} />
-            <Text preset="heading" text="Add Food" />
+          <View style={themed($header)}>
+            <Text text="add new safe food" style={themed($headerTitle)} />
+            <Pressable onPress={onClose} style={themed($closeIcon)}>
+              <MaterialCommunityIcons name="close" size={24} color="white" />
+            </Pressable>
           </View>
 
           {/* Form Fields */}
@@ -158,15 +161,34 @@ const $backdrop: ThemedStyle<ViewStyle> = () => ({
 
 const $modal: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({ 
   width: "90%", 
-  backgroundColor: colors.background, 
-  padding: spacing.lg, borderRadius: 16, 
+  backgroundColor: colors.createNewFoodModalBackground, 
+  paddingHorizontal: spacing.lg, 
+  paddingBottom: spacing.lg,
+  paddingTop: spacing.xs,
+  borderRadius: 16, 
 }) 
 
-const $headerRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({ 
-  flexDirection: "row", 
+const $header: ThemedStyle<ViewStyle> = ({ spacing }) => ({ 
+  width: "100%", 
   alignItems: "center", 
-  gap: spacing.sm, 
-  marginBottom: spacing.sm, 
+  justifyContent: "center", 
+  marginBottom: spacing.md, 
+  position: "relative",
+})
+
+const $headerTitle: ThemedStyle<TextStyle> = ({ typography }) => ({
+  fontFamily: typography.primary.bold,
+  fontSize: 26,
+  color: "white",
+  marginTop: 10,
+  lineHeight: 32,
+})
+
+const $closeIcon: ThemedStyle<ViewStyle> = () => ({
+  position: "absolute",
+  right: -4,
+  top: 4,
+  padding: 4,
 })
 
 const $field: ThemedStyle<ViewStyle> = ({ spacing }) => ({

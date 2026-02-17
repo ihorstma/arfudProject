@@ -33,6 +33,9 @@ const palette = {
 
   overlay20: "rgba(25, 16, 21, 0.2)",
   overlay50: "rgba(25, 16, 21, 0.5)",
+
+  // custom colors - will need to add to dark mode later
+  blueBackground: "#5FA1C1",
 } as const
 
 export const colors = {
@@ -82,4 +85,8 @@ export const colors = {
    * Error Background.
    */
   errorBackground: palette.angry100,
+
+  // custum colors
+  createNewFoodModalBackground: palette.blueBackground,
+
 } as const
