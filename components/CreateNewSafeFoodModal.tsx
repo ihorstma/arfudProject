@@ -1,3 +1,5 @@
+// the create a new safe food modal
+
 import { View, Modal, Pressable, ViewStyle} from "react-native"
 import { useRouter } from "expo-router"
 import { useMutation } from "convex/react"
@@ -12,9 +14,6 @@ import { TextField } from "@/components/TextField"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 import { useCustomAlert } from "@/components/CustomAlert"
-
-// there are way too many options, catagory, texture and temurature are not needed
-// we do need a slot for prep time
 
 const availableTags = [
   "sweet",

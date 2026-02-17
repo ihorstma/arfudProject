@@ -22,6 +22,8 @@ import { useAppTheme } from "@/theme/context"
 import { $styles } from "@/theme/styles"
 import type { ThemedStyle } from "@/theme/types"
 
+import SafeFoodsCreateModal from "@/components/CreateNewSafeFoodModal"
+
 const getRandomHeight = (id: string) => {
   let hash = 0
   for (let i = 0; i < id.length; i++) {
@@ -35,6 +37,7 @@ export default function FoodGridScreen() {
   const router = useRouter()
   const { themed, theme } = useAppTheme()
   const [searchQuery, setSearchQuery] = useState("")
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   const rawFoods = useQuery(api.foods.listFoods, { includeUnsafe: false }) ?? []
 
@@ -101,11 +104,15 @@ export default function FoodGridScreen() {
 
       <TouchableOpacity
         style={themed($fab)}
-        onPress={() => router.push("/safe-foods/create")}
+        onPress={() => setShowCreateModal(true)}
         activeOpacity={0.8}
       >
         <MaterialCommunityIcons name="plus" size={32} color={theme.colors.palette.neutral900} />
       </TouchableOpacity>
+      <SafeFoodsCreateModal
+        visible={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
     </Screen>
   )
 }
