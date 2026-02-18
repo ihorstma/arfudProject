@@ -193,7 +193,7 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
           {/* Stock Tag Selector */}
           <Text text="add stock" preset="subheading" />
           <View style={themed($tagContainer)}>
-            {availableTags.map(tag => {
+            {stockTags.map(tag => {
               const active = selectedStockTags.includes(tag.label)
               const textColor = tag.textColor ?? "white"
               return (
