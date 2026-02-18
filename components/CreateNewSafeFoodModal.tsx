@@ -64,7 +64,6 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
 
   const [name, setName] = useState("")
   const [isSafeText, setIsSafeText] = useState("true")
-  const [inStockText, setInStockText] = useState("true")
   const [imageUrl, setImageUrl] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [selectedPrepTags, setSelectedPrepTags] = useState<string[]>([])
@@ -79,34 +78,32 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
 
   const togglePrepTag = (tag: string) => {
     setSelectedPrepTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+      prev.includes(tag) ? [] : [tag]
     )
   }
 
   const toggleStockTag = (tag: string) => {
     setSelectedStockTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+      prev.includes(tag) ? [] : [tag]
     )
   }
 
   const resetForm = () => {
     setName("")
     setIsSafeText("true")
-    setInStockText("true")
     setImageUrl("")
   }
 
   const handleSave = async () => {
     if (!name.trim()) {
-      showAlert("Missing fields", "Name, category, texture, and temperature are required.")
+      showAlert("Missing field", "Name")
       return
     }
 
     const parsedSafe = parseBoolean(isSafeText)
-    const parsedInStock = parseBoolean(inStockText)
 
-    if (parsedSafe === null || parsedInStock === null) {
-      showAlert("Invalid values", "Use true/false for Safe and In Stock.")
+    if (parsedSafe === null) {
+      showAlert("Invalid values", "Use true/false for Safe.")
       return
     }
 
@@ -216,7 +213,6 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
           </View>
 
           <TextField label="archive (true/false)" value={isSafeText} onChangeText={setIsSafeText} autoCapitalize="none" containerStyle={themed($field)} />
-          <TextField label="in stock (true/false)" value={inStockText} onChangeText={setInStockText} autoCapitalize="none" containerStyle={themed($field)} />
           <TextField label="image url" value={imageUrl} onChangeText={setImageUrl} autoCapitalize="none" containerStyle={themed($field)} />
           </View>
 
