@@ -8,6 +8,7 @@ export default defineSchema({
     inStock: v.boolean(),
     imageUrl: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
+    prepTime: v.optional(v.array(v.string())),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

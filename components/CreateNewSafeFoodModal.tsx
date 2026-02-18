@@ -30,7 +30,13 @@ const availableTags = [
   { label: "hot", color: "#FF4B3E"},
   { label: "cool", color: "#4F7DA7"},
   { label: "cold", color: "#A5D8FF"},
-  { label: "crumbly", color: "#f7a663d9"} // no figma color, subject to change
+  { label: "crumbly", color: "#f7a663d9"}, // no figma color, subject to change
+]
+
+const prepTimeTags = [
+  { label: "minimal prep", color: "#E0C5F0" },
+  { label: "moderate prep", color: "#9D7BAE" },
+  { label: "full prep", color: "#775587" },
 ]
 
 interface addFoodModalProps {
@@ -55,11 +61,18 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
   const [inStockText, setInStockText] = useState("true")
   const [imageUrl, setImageUrl] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [selectedPrepTags, setSelectedPrepTags] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev,tag]
+    )
+  }
+
+  const togglePrepTag = (tag: string) => {
+    setSelectedPrepTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     )
   }
 
@@ -92,6 +105,7 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
         inStock: parsedInStock,
         imageUrl: imageUrl.trim() || undefined,
         tags: selectedTags,
+        prepTime: selectedPrepTags,
       })
       resetForm()
       onClose()
@@ -122,11 +136,8 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
 
           {/* Form Fields */}
           <TextField label="name" value={name} onChangeText={setName} containerStyle={themed($field)} />
-          <TextField label="archive (true/false)" value={isSafeText} onChangeText={setIsSafeText} autoCapitalize="none" containerStyle={themed($field)} />
-          <TextField label="in stock (true/false)" value={inStockText} onChangeText={setInStockText} autoCapitalize="none" containerStyle={themed($field)} />
-          <TextField label="image erl" value={imageUrl} onChangeText={setImageUrl} autoCapitalize="none" containerStyle={themed($field)} />
 
-          {/* Tag Selector */}
+          {/* Sensory Tag Selector */}
           <Text text="sensory tags" preset="subheading" />
           <View style={themed($tagContainer)}>
             {availableTags.map(tag => {
@@ -139,22 +150,54 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
                   style={themed($tag(active, tag.color))}
                 >
                 {/* add the +/- depending on if the tag is active or not */}
-                  <View style={{ flexDirection: "row", alignItems: "center"}}>
-                    <Text text={tag.label} style={{ color: textColor}} />
-                    <Text text={active ? " -" : " +"} style={{ color: textColor}}/>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text text={tag.label} style={{ color: textColor }} />
+                    <Text text={active ? " -" : " +" } style={{ color: textColor }}/>
                   </View>
                 </Pressable>
               )
             })}
           </View>
 
+          {/* Prep Time Tag Selector */}
+          <Text text="prep time" preset="subheading" />
+          <View style={themed($tagContainer)}>
+            {prepTimeTags.map(tag => {
+              const active = selectedPrepTags.includes(tag.label)
+              return (
+                <Pressable 
+                  key={tag.label} 
+                  onPress={() => togglePrepTag(tag.label)}
+                  style={themed($tag(active, tag.color))}
+                >
+                {/* add the +/- depending on if the tag is active or not */}
+                  <View style={{ flexDirection: "row", alignItems: "center"}}>
+                    <Text text={tag.label} style={{ color: "white" } } />
+                    <Text text={ active ? " -" : " +" } style={{ color: "white" }}/>
+                  </View>
+                </Pressable>
+              )
+            })}
+          </View>
+
+          <TextField label="archive (true/false)" value={isSafeText} onChangeText={setIsSafeText} autoCapitalize="none" containerStyle={themed($field)} />
+          <TextField label="in stock (true/false)" value={inStockText} onChangeText={setInStockText} autoCapitalize="none" containerStyle={themed($field)} />
+          <TextField label="image url" value={imageUrl} onChangeText={setImageUrl} autoCapitalize="none" containerStyle={themed($field)} />
+          </View>
+
           {/* add new safe food button */}
-          <View style={themed($actions)}>
-            <Button text="add new safe food" onPress={handleSave} disabled={isSaving} />
+          <View style={themed($action)}>
+            <Button 
+              text="add new safe food" 
+              onPress={handleSave} 
+              disabled={isSaving} 
+              preset="filled"
+              style={{ backgroundColor: "#FF9400" }}
+              textStyle={{ color: "white" }}
+            />
           </View>
 
         </View>
-      </View>
     </Modal>
   )
 }
@@ -221,8 +264,6 @@ const $tag = (active: boolean, color: string): ThemedStyle<ViewStyle> => ({ colo
 
 })
 
-const $actions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  flexDirection: "row",
-  gap: spacing.sm,
-  marginTop: spacing.md,
+const $action: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginTop: spacing.lg  
 })

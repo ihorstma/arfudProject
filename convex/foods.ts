@@ -52,6 +52,7 @@ const addFoodArgs = {
   inStock: v.boolean(),
   imageUrl: v.optional(v.string()),
   tags: v.optional(v.array(v.string())),
+  prepTime: v.optional(v.array(v.string())),
 }
 
 export const addFood = mutation({
@@ -73,6 +74,7 @@ const updateFoodArgs = {
   inStock: v.optional(v.boolean()),
   imageUrl: v.optional(v.string()),
   tags: v.optional(v.array(v.string())),
+  prepTime: v.optional(v.array(v.string())),
 }
 
 export const updateFood = mutation({
