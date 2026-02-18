@@ -39,6 +39,12 @@ const prepTimeTags = [
   { label: "full prep", color: "#775587" },
 ]
 
+const stockTags = [
+  { label: "in stock", color: "#A5D721" },
+  { label: "low stock", color: "#FFF017", textColor: "#6A6767"},  // custom text color as the tag is too pale for white
+  { label: "out of stock", color: "#BF503F" }
+]
+
 interface addFoodModalProps {
   visible: boolean 
   onClose: () => void
@@ -62,6 +68,7 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
   const [imageUrl, setImageUrl] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [selectedPrepTags, setSelectedPrepTags] = useState<string[]>([])
+  const [selectedStockTags, setSelectedStockTags] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
 
   const toggleTag = (tag: string) => {
@@ -72,6 +79,12 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
 
   const togglePrepTag = (tag: string) => {
     setSelectedPrepTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    )
+  }
+
+  const toggleStockTag = (tag: string) => {
+    setSelectedStockTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     )
   }
@@ -174,6 +187,28 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
                   <View style={{ flexDirection: "row", alignItems: "center"}}>
                     <Text text={tag.label} style={{ color: "white" } } />
                     <Text text={ active ? " -" : " +" } style={{ color: "white" }}/>
+                  </View>
+                </Pressable>
+              )
+            })}
+          </View>
+
+          {/* Stock Tag Selector */}
+          <Text text="add stock" preset="subheading" />
+          <View style={themed($tagContainer)}>
+            {availableTags.map(tag => {
+              const active = selectedStockTags.includes(tag.label)
+              const textColor = tag.textColor ?? "white"
+              return (
+                <Pressable 
+                  key={tag.label} 
+                  onPress={() => toggleStockTag(tag.label)}
+                  style={themed($tag(active, tag.color))}
+                >
+                {/* add the +/- depending on if the tag is active or not */}
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text text={tag.label} style={{ color: textColor }} />
+                    <Text text={active ? " -" : " +" } style={{ color: textColor }}/>
                   </View>
                 </Pressable>
               )
