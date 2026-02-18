@@ -17,19 +17,19 @@ import { useCustomAlert } from "@/components/CustomAlert"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 
 const availableTags = [
-  "sweet",
-  "savory",
-  "crunchy",
-  "firm",
-  "soft",
-  "chewy",
-  "creamy",
-  "sticky",
-  "dry",
-  "warm",
-  "hot",
-  "cool",
-  "cold",
+  { label: "sweet", color: "#F28FB0"},
+  { label: "savory", color: "#A7C68B"},
+  { label: "crunchy", color: "#FF9400"},
+  { label: "firm", color: "#6BB9AD"}, 
+  { label: "soft", color: "#FFB7C6"},
+  { label: "chewy", color: "#EEC036"},
+  { label: "creamy", color: "#F8E6D1", textColor: "#6A6767"}, // custom text color as the tag is too pale for white
+  { label: "sticky", color: "#D16D8B"},
+  { label: "dry", color: "#BFC5C2"},
+  { label: "warm", color: "#DF7471"},
+  { label: "hot", color: "#FF4B3E"},
+  { label: "cool", color: "#4F7DA7"},
+  { label: "cold", color: "#A5D8FF"},
 ]
 
 interface addFoodModalProps {
@@ -120,30 +120,36 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
           </View>
 
           {/* Form Fields */}
-          <TextField label="Name" value={name} onChangeText={setName} containerStyle={themed($field)} />
-          <TextField label="Safe (true/false)" value={isSafeText} onChangeText={setIsSafeText} autoCapitalize="none" containerStyle={themed($field)} />
-          <TextField label="In Stock (true/false)" value={inStockText} onChangeText={setInStockText} autoCapitalize="none" containerStyle={themed($field)} />
-          <TextField label="Image URL" value={imageUrl} onChangeText={setImageUrl} autoCapitalize="none" containerStyle={themed($field)} />
+          <TextField label="name" value={name} onChangeText={setName} containerStyle={themed($field)} />
+          <TextField label="archive (true/false)" value={isSafeText} onChangeText={setIsSafeText} autoCapitalize="none" containerStyle={themed($field)} />
+          <TextField label="in stock (true/false)" value={inStockText} onChangeText={setInStockText} autoCapitalize="none" containerStyle={themed($field)} />
+          <TextField label="image erl" value={imageUrl} onChangeText={setImageUrl} autoCapitalize="none" containerStyle={themed($field)} />
 
           {/* Tag Selector */}
           <Text text="sensory tags" preset="subheading" />
           <View style={themed($tagContainer)}>
             {availableTags.map(tag => {
-              const active = selectedTags.includes(tag)
+              const active = selectedTags.includes(tag.label)
+              const textColor = tag.textColor ?? "white"
               return (
-                <Pressable key={tag} onPress={() => toggleTag(tag)}
-                  style={themed($tag(active))}
+                <Pressable 
+                  key={tag.label} 
+                  onPress={() => toggleTag(tag.label)}
+                  style={themed($tag(active, tag.color))}
                 >
-                  <Text text={tag} />
+                {/* add the +/- depending on if the tag is active or not */}
+                  <View style={{ flexDirection: "row", alignItems: "center"}}>
+                    <Text text={tag.label} style={{ color: textColor}} />
+                    <Text text={active ? " -" : " +"} style={{ color: textColor}}/>
+                  </View>
                 </Pressable>
               )
             })}
           </View>
 
-          {/* Buttons */}
+          {/* add new safe food button */}
           <View style={themed($actions)}>
-            <Button text="Save" onPress={handleSave} disabled={isSaving} />
-            <Button text="Cancel" preset="reversed" onPress={onClose} />
+            <Button text="add new safe food" onPress={handleSave} disabled={isSaving} />
           </View>
 
         </View>
@@ -203,11 +209,15 @@ const $tagContainer: ThemedStyle<ViewStyle> = () => ({
   marginVertical: 8, 
 })
 
-const $tag = (active: boolean): ThemedStyle<ViewStyle> => ({ colors, spacing }) => ({ 
+const $tag = (active: boolean, color: string): ThemedStyle<ViewStyle> => ({ colors }) => ({ 
   paddingVertical: 6, 
   paddingHorizontal: 12, 
-  borderRadius: 20, 
-  backgroundColor: active ? colors.tint : colors.palette.neutral200, 
+  borderRadius: 3, 
+  backgroundColor: color, 
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+
 })
 
 const $actions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
