@@ -30,6 +30,7 @@ const availableTags = [
   { label: "hot", color: "#FF4B3E"},
   { label: "cool", color: "#4F7DA7"},
   { label: "cold", color: "#A5D8FF"},
+  { label: "crumbly", color: "#f7a663d9"} // no figma color, subject to change
 ]
 
 interface addFoodModalProps {
