@@ -140,7 +140,6 @@ export default function SafeFoodsListScreen() {
   if (isConvexAuthLoading) {
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]} contentContainerStyle={$styles.flex1}>
-        <Stack.Screen options={{ title: "Manage Foods", headerShown: true }} />
         <View style={themed($emptyState)}>
           <Text text="Loading..." />
         </View>
@@ -150,7 +149,6 @@ export default function SafeFoodsListScreen() {
 
   return (
     <Screen preset="fixed" safeAreaEdges={["top"]} contentContainerStyle={$styles.flex1}>
-      <Stack.Screen options={{ title: "Manage Foods", headerShown: true }} />
       <FlatList
         data={sortedFoods}
         keyExtractor={(item) => item._id}
@@ -323,6 +321,7 @@ const $listContent: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 const $header: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   gap: spacing.sm,
   marginBottom: spacing.md,
+  paddingTop: 0,
 })
 
 const $actionsRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -376,8 +375,8 @@ const $chip: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   borderColor: colors.separator,
   borderRadius: 999,
   borderWidth: 1,
-  paddingHorizontal: spacing.sm,
-  paddingVertical: spacing.xs,
+  paddingHorizontal: spacing.xs,
+  paddingVertical: 2,
 })
 
 const $chipActive: ThemedStyle<ViewStyle> = ({ colors }) => ({
@@ -387,7 +386,7 @@ const $chipActive: ThemedStyle<ViewStyle> = ({ colors }) => ({
 
 const $chipText: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.text,
-  fontSize: 12,
+  fontSize: 11,
 })
 
 const $chipTextActive: ThemedStyle<TextStyle> = ({ colors }) => ({

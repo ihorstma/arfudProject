@@ -123,7 +123,6 @@ export default function FoodGridScreen() {
       contentContainerStyle={$styles.flex1}
       style={{ backgroundColor: theme.colors.palette.neutral100 }}
     >
-      <Stack.Screen options={{ title: "Safe Foods", headerShown: true }} />
       <View style={themed($header)}>
         <Searchbar
           placeholder="Search safe foods"
@@ -275,19 +274,21 @@ const $metaLabel: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
 
 const $header: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   paddingHorizontal: spacing.md,
-  paddingTop: spacing.md,
-  gap: spacing.sm,
+  paddingTop: 0,
+  gap: spacing.xs,
 })
 
 const $searchBar: ThemedStyle<ViewStyle> = ({ colors }) => ({
   backgroundColor: colors.palette.neutral200,
   borderRadius: 12,
   elevation: 0,
+  minHeight: 36,
 })
 
 const $searchInput: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.text,
   minHeight: 0,
+  fontSize: 14,
 })
 
 const $segmentRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -299,8 +300,8 @@ const $segmentButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   borderColor: colors.palette.neutral400,
   borderRadius: 10,
   borderWidth: 1,
-  paddingHorizontal: spacing.sm,
-  paddingVertical: spacing.xs,
+  paddingHorizontal: spacing.xs,
+  paddingVertical: 2,
 })
 
 const $segmentButtonActive: ThemedStyle<ViewStyle> = ({ colors }) => ({
@@ -311,7 +312,7 @@ const $segmentButtonActive: ThemedStyle<ViewStyle> = ({ colors }) => ({
 const $segmentText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   color: colors.text,
   fontFamily: typography.primary.normal,
-  fontSize: 12,
+  fontSize: 11,
 })
 
 const $segmentTextActive: ThemedStyle<TextStyle> = ({ colors }) => ({
@@ -319,7 +320,7 @@ const $segmentTextActive: ThemedStyle<TextStyle> = ({ colors }) => ({
 })
 
 const $chipList: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  paddingVertical: spacing.xxs,
+  paddingVertical: spacing.xxxs,
   gap: spacing.xs,
 })
 
@@ -327,8 +328,8 @@ const $chip: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   borderColor: colors.separator,
   borderRadius: 999,
   borderWidth: 1,
-  paddingHorizontal: spacing.sm,
-  paddingVertical: spacing.xs,
+  paddingHorizontal: spacing.xs,
+  paddingVertical: 2,
 })
 
 const $chipActive: ThemedStyle<ViewStyle> = ({ colors }) => ({
@@ -338,7 +339,7 @@ const $chipActive: ThemedStyle<ViewStyle> = ({ colors }) => ({
 
 const $chipText: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.text,
-  fontSize: 12,
+  fontSize: 11,
 })
 
 const $chipTextActive: ThemedStyle<TextStyle> = ({ colors }) => ({
