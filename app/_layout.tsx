@@ -4,14 +4,13 @@ import { Stack } from "expo-router"
 import { KeyboardProvider } from "react-native-keyboard-controller"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 
+import { CustomAlertProvider } from "@/components/CustomAlert"
 import { AuthProvider } from "@/context/AuthContext"
 import { ConvexClientProvider } from "@/ConvexClientProvider"
 import { initI18n } from "@/i18n"
 import { ThemeProvider } from "@/theme/context"
 import { customFontsToLoad } from "@/theme/typography"
 import { loadDateFnsLocale } from "@/utils/formatDate"
-
-import { CustomAlertProvider } from "@/components/CustomAlert"
 
 export default function RootLayout() {
   const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad)
@@ -34,7 +33,9 @@ export default function RootLayout() {
           <AuthProvider>
             <ThemeProvider>
               <CustomAlertProvider>
-                <Stack screenOptions={{ headerShown: false, animation: "fade", animationDuration: 30 }}>
+                <Stack
+                  screenOptions={{ headerShown: false, animation: "fade", animationDuration: 30 }}
+                >
                   <Stack.Screen name="index" />
                   <Stack.Screen name="login" />
                   <Stack.Screen name="(demo)" />

@@ -4,5 +4,5 @@ import { useAuth } from "@/context/AuthContext"
 
 export default function Index() {
   const { isAuthenticated } = useAuth()
-  return <Redirect href={isAuthenticated ? "/(demo)/showroom" : "/login"} />
+  return <Redirect href={isAuthenticated ? "/(demo)/food-grid" : "/login"} />
 }

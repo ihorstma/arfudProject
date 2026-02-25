@@ -5,6 +5,7 @@ import { useRouter } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 
 import { Button } from "@/components/Button"
+import { useCustomAlert } from "@/components/CustomAlert"
 import { PressableIcon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
@@ -13,7 +14,6 @@ import { useAuth } from "@/context/AuthContext"
 import { authClient } from "@/services/auth-client"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
-import { useCustomAlert } from "@/components/CustomAlert"
 
 export default function LoginScreen() {
   const authPasswordInput = useRef<TextInput>(null)
@@ -31,7 +31,7 @@ export default function LoginScreen() {
 
   const {
     themed,
-    theme: { colors, spacing },
+    theme: { colors },
   } = useAppTheme()
 
   const validationError = useMemo(() => {
@@ -43,7 +43,7 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/(demo)/showroom")
+      router.replace("/(demo)/food-grid")
     }
   }, [isAuthenticated, router])
 
@@ -69,7 +69,7 @@ export default function LoginScreen() {
     } else {
       setIsSubmitted(false)
       setAuthPassword("")
-      router.replace("/(demo)/showroom")
+      router.replace("/(demo)/food-grid")
     }
   }
 
@@ -98,7 +98,7 @@ export default function LoginScreen() {
       <View style={themed($logoContainer)}>
         <Image source={require("@assets/icons/logo.png")} style={themed($logo)} />
       </View>
-      
+
       {attemptsCount > 2 && (
         <Text tx="loginScreen:hint" size="sm" weight="light" style={themed($hint)} />
       )}
@@ -164,13 +164,13 @@ export default function LoginScreen() {
         pressedStyle={themed($authKitButtonPressed)}
         LeftAccessory={(props) => (
           <View style={[props.style, themed($iconSpacing)]}>
-             <Ionicons name="logo-google" size={20} color={colors.palette.neutral100} />
+            <Ionicons name="logo-google" size={20} color={colors.palette.neutral100} />
           </View>
         )}
         onPress={() =>
           authClient.signIn.social({
             provider: "google",
-            callbackURL: "arfud://(demo)/showroom",
+            callbackURL: "arfud://(demo)/food-grid",
           })
         }
       />
@@ -188,7 +188,7 @@ export default function LoginScreen() {
         onPress={() =>
           authClient.signIn.social({
             provider: "apple",
-            callbackURL: "arfud://(demo)/showroom",
+            callbackURL: "arfud://(demo)/food-grid",
           })
         }
       />
@@ -209,20 +209,14 @@ const $screenContentContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   alignItems: "stretch",
 })
 
-const $logoContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  alignItems: "center"
+const $logoContainer: ThemedStyle<ViewStyle> = () => ({
+  alignItems: "center",
 })
 
 const $logo: ThemedStyle<ImageStyle> = () => ({
   height: 300,
   width: "100%",
   resizeMode: "contain",
-})
-
-const $heading: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  marginBottom: spacing.lg,
-  textAlign: "center",
-  fontSize: 32,
 })
 
 const $hint: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
@@ -286,7 +280,7 @@ const $authKitButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => (
   fontFamily: typography.primary.normal,
 })
 
-const $authKitButtonPressed: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $authKitButtonPressed: ThemedStyle<ViewStyle> = () => ({
   backgroundColor: "#333333",
 })
 
