@@ -30,6 +30,32 @@ export default function DemoLayout() {
         }}
       >
         <Tabs.Screen
+          name="home"
+          options={{
+            tabBarLabel: "Home",
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons
+                name="home-outline"
+                color={focused ? colors.tint : colors.tintInactive}
+                size={30}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="journal"
+          options={{
+            tabBarLabel: "Journal",
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons
+                name="book-open-outline"
+                color={focused ? colors.tint : colors.tintInactive}
+                size={30}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="food-grid"
           options={{
             tabBarLabel: "Safe Foods",
@@ -42,13 +68,33 @@ export default function DemoLayout() {
             ),
           }}
         />
-        <Tabs.Screen name="showroom" options={{ href: null }} />
-        <Tabs.Screen name="podcast" options={{ href: null }} />
-        <Tabs.Screen name="demos" options={{ href: null }} />
-        <Tabs.Screen name="DrawerIconButton" options={{ href: null }} />
-        <Tabs.Screen name="SectionListWithKeyboardAwareScrollView" options={{ href: null }} />
-        <Tabs.Screen name="DemoDivider" options={{ href: null }} />
-        <Tabs.Screen name="DemoUseCase" options={{ href: null }} />
+        <Tabs.Screen
+          name="chat-placeholder"
+          options={{
+            tabBarLabel: "Chat",
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons
+                name="chat-outline"
+                color={focused ? colors.tint : colors.tintInactive}
+                size={30}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="grocery-list"
+          options={{
+            tabBarLabel: "List",
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons
+                name="cart-outline"
+                color={focused ? colors.tint : colors.tintInactive}
+                size={30}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen name="safe-food-manager" options={{ href: null }} />
         <Tabs.Screen
           name="debug"
           options={{
@@ -58,6 +104,13 @@ export default function DemoLayout() {
             ),
           }}
         />
+        <Tabs.Screen name="showroom" options={{ href: null }} />
+        <Tabs.Screen name="podcast" options={{ href: null }} />
+        <Tabs.Screen name="demos" options={{ href: null }} />
+        <Tabs.Screen name="DrawerIconButton" options={{ href: null }} />
+        <Tabs.Screen name="SectionListWithKeyboardAwareScrollView" options={{ href: null }} />
+        <Tabs.Screen name="DemoDivider" options={{ href: null }} />
+        <Tabs.Screen name="DemoUseCase" options={{ href: null }} />
       </Tabs>
     </EpisodeProvider>
   )

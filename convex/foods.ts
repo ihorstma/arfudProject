@@ -209,3 +209,54 @@ export const markOutOfStock = mutation({
     return null
   },
 })
+
+export const seedFoods = mutation({
+  args: {},
+  returns: v.null(),
+  handler: async (ctx) => {
+    const ownerId = await requireOwnerId(ctx)
+    const CATEGORIES = ["Breakfast", "Lunch", "Dinner", "Snack", "Dessert", "Drink"]
+    const TEXTURES = ["Crunchy", "Soft", "Smooth", "Chewy", "Liquid", "Mixed"]
+    const TEMPERATURES = ["Hot", "Cold", "Room Temp"]
+    const DISHES = [
+      "Pizza",
+      "Pasta",
+      "Burger",
+      "Salad",
+      "Sushi",
+      "Tacos",
+      "Soup",
+      "Sandwich",
+      "Ice Cream",
+      "Cake",
+      "Apple",
+      "Banana",
+      "Chicken",
+      "Rice",
+      "Steak",
+      "Fries",
+      "Eggs",
+      "Toast",
+      "Cereal",
+      "Yogurt",
+    ]
+
+    for (let i = 0; i < 20; i++) {
+      const name = DISHES[i % DISHES.length] + (i >= DISHES.length ? ` ${Math.floor(i / DISHES.length)}` : "")
+      await ctx.db.insert("foods", {
+        ownerId,
+        name,
+        description: `Delicious ${name}`,
+        category: CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)],
+        texture: TEXTURES[Math.floor(Math.random() * TEXTURES.length)],
+        temperature: TEMPERATURES[Math.floor(Math.random() * TEMPERATURES.length)],
+        isSafe: Math.random() > 0.3,
+        inStock: Math.random() > 0.2,
+        imageUrl: `https://loremflickr.com/300/300/food?lock=${i}`,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      })
+    }
+    return null
+  },
+})

@@ -31,4 +31,18 @@ export default defineSchema({
     .index("by_isSafe_and_texture", ["isSafe", "texture"])
     .index("by_isSafe_and_temperature", ["isSafe", "temperature"])
     .index("by_isSafe_and_inStock", ["isSafe", "inStock"]),
+
+  groceryItems: defineTable({
+    ownerId: v.string(),
+    name: v.string(),
+    category: v.string(),
+    quantity: v.optional(v.string()),
+    isCompleted: v.boolean(),
+    isSafeFood: v.boolean(),
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_ownerId", ["ownerId"])
+    .index("by_ownerId_and_isCompleted", ["ownerId", "isCompleted"]),
 })
