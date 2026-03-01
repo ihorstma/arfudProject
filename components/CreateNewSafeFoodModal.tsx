@@ -280,18 +280,19 @@ const $field: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 const $tagContainer: ThemedStyle<ViewStyle> = () => ({ 
   flexDirection: "row", 
   flexWrap: "wrap", 
-  gap: 8, 
-  marginVertical: 8, 
+  gap: 6, 
+  marginVertical: 6, 
 })
 
 const $tag = (active: boolean, color: string): ThemedStyle<ViewStyle> => ({ colors }) => ({ 
-  paddingVertical: 6, 
-  paddingHorizontal: 12, 
+  paddingVertical: 4, 
+  paddingHorizontal: 8, 
   borderRadius: 3, 
   backgroundColor: color, 
   flexDirection: "row",
   alignItems: "center",
-  justifyContent: "space-between",
+  gap: 4,
+  alignSelf: "flex-start",
 
 })
 
