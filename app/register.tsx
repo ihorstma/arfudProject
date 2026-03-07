@@ -31,7 +31,7 @@ export default function RegisterScreen() {
 
   const {
     themed,
-    theme: { colors, spacing },
+    theme: { colors },
   } = useAppTheme()
 
   const validationError = useMemo(() => {
@@ -43,7 +43,7 @@ export default function RegisterScreen() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/(demo)/showroom")
+      router.replace("/(demo)/food-grid")
     }
   }, [isAuthenticated, router])
 
@@ -179,13 +179,13 @@ export default function RegisterScreen() {
         pressedStyle={themed($authKitButtonPressed)}
         LeftAccessory={(props) => (
           <View style={[props.style, themed($iconSpacing)]}>
-             <Ionicons name="logo-google" size={20} color={colors.palette.neutral100} />
+            <Ionicons name="logo-google" size={20} color={colors.palette.neutral100} />
           </View>
         )}
         onPress={() =>
           authClient.signIn.social({
             provider: "google",
-            callbackURL: "arfud://(demo)/showroom",
+            callbackURL: "arfud://(demo)/food-grid",
           })
         }
       />
@@ -203,7 +203,7 @@ export default function RegisterScreen() {
         onPress={() =>
           authClient.signIn.social({
             provider: "apple",
-            callbackURL: "arfud://(demo)/showroom",
+            callbackURL: "arfud://(demo)/food-grid",
           })
         }
       />
@@ -224,7 +224,7 @@ const $screenContentContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   alignItems: "stretch",
 })
 
-const $logoContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+const $logoContainer: ThemedStyle<ViewStyle> = () => ({
   alignItems: "center",
 })
 
@@ -232,12 +232,6 @@ const $logo: ThemedStyle<ImageStyle> = () => ({
   height: 300,
   width: "100%",
   resizeMode: "contain",
-})
-
-const $heading: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  marginBottom: spacing.lg,
-  textAlign: "center",
-  fontSize: 32,
 })
 
 const $textFieldContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -295,7 +289,7 @@ const $authKitButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => (
   fontFamily: typography.primary.normal,
 })
 
-const $authKitButtonPressed: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $authKitButtonPressed: ThemedStyle<ViewStyle> = () => ({
   backgroundColor: "#333333",
 })
 

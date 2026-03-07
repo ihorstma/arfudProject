@@ -1,9 +1,10 @@
-import { httpRouter } from "convex/server";
-import { authComponent, createAuth } from "./auth";
+import { httpRouter } from "convex/server"
 
-const http = httpRouter();
+import { authComponent, createAuth } from "./auth"
+
+const http = httpRouter()
 
 // CORS handling is required for client-side frameworks
-authComponent.registerRoutes(http, createAuth, { cors: true });
+authComponent.registerRoutes(http, createAuth, { cors: true })
 
-export default http;
+export default http

@@ -1,0 +1,173 @@
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+export default defineSchema({
+  account: defineTable({
+    accessToken: v.optional(v.union(v.null(), v.string())),
+    accessTokenExpiresAt: v.optional(
+      v.union(v.null(), v.float64())
+    ),
+    accountId: v.string(),
+    createdAt: v.float64(),
+    idToken: v.optional(v.union(v.null(), v.string())),
+    password: v.optional(v.union(v.null(), v.string())),
+    providerId: v.string(),
+    refreshToken: v.optional(v.union(v.null(), v.string())),
+    refreshTokenExpiresAt: v.optional(
+      v.union(v.null(), v.float64())
+    ),
+    scope: v.optional(v.union(v.null(), v.string())),
+    updatedAt: v.float64(),
+    userId: v.string(),
+  })
+    .index("accountId", ["accountId"])
+    .index("accountId_providerId", [
+      "accountId",
+      "providerId",
+    ])
+    .index("providerId_userId", ["providerId", "userId"])
+    .index("userId", ["userId"]),
+  jwks: defineTable({
+    createdAt: v.float64(),
+    privateKey: v.string(),
+    publicKey: v.string(),
+  }),
+  oauthAccessToken: defineTable({
+    accessToken: v.optional(v.union(v.null(), v.string())),
+    accessTokenExpiresAt: v.optional(
+      v.union(v.null(), v.float64())
+    ),
+    clientId: v.optional(v.union(v.null(), v.string())),
+    createdAt: v.optional(v.union(v.null(), v.float64())),
+    refreshToken: v.optional(v.union(v.null(), v.string())),
+    refreshTokenExpiresAt: v.optional(
+      v.union(v.null(), v.float64())
+    ),
+    scopes: v.optional(v.union(v.null(), v.string())),
+    updatedAt: v.optional(v.union(v.null(), v.float64())),
+    userId: v.optional(v.union(v.null(), v.string())),
+  })
+    .index("accessToken", ["accessToken"])
+    .index("clientId", ["clientId"])
+    .index("refreshToken", ["refreshToken"])
+    .index("userId", ["userId"]),
+  oauthApplication: defineTable({
+    clientId: v.optional(v.union(v.null(), v.string())),
+    clientSecret: v.optional(v.union(v.null(), v.string())),
+    createdAt: v.optional(v.union(v.null(), v.float64())),
+    disabled: v.optional(v.union(v.null(), v.boolean())),
+    icon: v.optional(v.union(v.null(), v.string())),
+    metadata: v.optional(v.union(v.null(), v.string())),
+    name: v.optional(v.union(v.null(), v.string())),
+    redirectURLs: v.optional(v.union(v.null(), v.string())),
+    type: v.optional(v.union(v.null(), v.string())),
+    updatedAt: v.optional(v.union(v.null(), v.float64())),
+    userId: v.optional(v.union(v.null(), v.string())),
+  })
+    .index("clientId", ["clientId"])
+    .index("userId", ["userId"]),
+  oauthConsent: defineTable({
+    clientId: v.optional(v.union(v.null(), v.string())),
+    consentGiven: v.optional(
+      v.union(v.null(), v.boolean())
+    ),
+    createdAt: v.optional(v.union(v.null(), v.float64())),
+    scopes: v.optional(v.union(v.null(), v.string())),
+    updatedAt: v.optional(v.union(v.null(), v.float64())),
+    userId: v.optional(v.union(v.null(), v.string())),
+  })
+    .index("clientId_userId", ["clientId", "userId"])
+    .index("userId", ["userId"]),
+  passkey: defineTable({
+    aaguid: v.optional(v.union(v.null(), v.string())),
+    backedUp: v.boolean(),
+    counter: v.float64(),
+    createdAt: v.optional(v.union(v.null(), v.float64())),
+    credentialID: v.string(),
+    deviceType: v.string(),
+    name: v.optional(v.union(v.null(), v.string())),
+    publicKey: v.string(),
+    transports: v.optional(v.union(v.null(), v.string())),
+    userId: v.string(),
+  })
+    .index("credentialID", ["credentialID"])
+    .index("userId", ["userId"]),
+  rateLimit: defineTable({
+    count: v.optional(v.union(v.null(), v.float64())),
+    key: v.optional(v.union(v.null(), v.string())),
+    lastRequest: v.optional(v.union(v.null(), v.float64())),
+  }).index("key", ["key"]),
+  session: defineTable({
+    createdAt: v.float64(),
+    expiresAt: v.float64(),
+    ipAddress: v.optional(v.union(v.null(), v.string())),
+    token: v.string(),
+    updatedAt: v.float64(),
+    userAgent: v.optional(v.union(v.null(), v.string())),
+    userId: v.string(),
+  })
+    .index("expiresAt", ["expiresAt"])
+    .index("expiresAt_userId", ["expiresAt", "userId"])
+    .index("token", ["token"])
+    .index("userId", ["userId"]),
+  twoFactor: defineTable({
+    backupCodes: v.string(),
+    secret: v.string(),
+    userId: v.string(),
+  }).index("userId", ["userId"]),
+  user: defineTable({
+    createdAt: v.float64(),
+    displayUsername: v.optional(
+      v.union(v.null(), v.string())
+    ),
+    email: v.string(),
+    emailVerified: v.boolean(),
+    image: v.optional(v.union(v.null(), v.string())),
+    isAnonymous: v.optional(v.union(v.null(), v.boolean())),
+    name: v.string(),
+    phoneNumber: v.optional(v.union(v.null(), v.string())),
+    phoneNumberVerified: v.optional(
+      v.union(v.null(), v.boolean())
+    ),
+    twoFactorEnabled: v.optional(
+      v.union(v.null(), v.boolean())
+    ),
+    updatedAt: v.float64(),
+    userId: v.optional(v.union(v.null(), v.string())),
+    username: v.optional(v.union(v.null(), v.string())),
+  })
+    .index("email_name", ["email", "name"])
+    .index("name", ["name"])
+    .index("phoneNumber", ["phoneNumber"])
+    .index("userId", ["userId"])
+    .index("username", ["username"]),
+  verification: defineTable({
+    createdAt: v.float64(),
+    expiresAt: v.float64(),
+    identifier: v.string(),
+    updatedAt: v.float64(),
+    value: v.string(),
+  })
+    .index("expiresAt", ["expiresAt"])
+    .index("identifier", ["identifier"]),
+});
+
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+export default defineSchema({
+  foods: defineTable({
+    name: v.string(),
+    isSafe: v.boolean(),
+    inStock: v.boolean(),
+    imageUrl: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
+    prepTime: v.optional(v.array(v.string())),
+    stockStatus: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_isSafe", ["isSafe"])
+    .index("by_inStock", ["inStock"])
+    .index("by_isSafe_inStock", ["isSafe", "inStock"]),
+});

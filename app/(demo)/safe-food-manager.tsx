@@ -8,7 +8,7 @@ import {
   View,
   ViewStyle,
 } from "react-native"
-import { Stack, useRouter } from "expo-router"
+import { useRouter } from "expo-router"
 import { useConvex, useConvexAuth, useMutation, useQuery } from "convex/react"
 
 import { Button } from "@/components/Button"
@@ -30,7 +30,7 @@ const getLabel = (mode: SortMode) => {
   return "Recent"
 }
 
-export default function SafeFoodsListScreen() {
+export default function SafeFoodManagerScreen() {
   const router = useRouter()
   const convex = useConvex()
   const { isAuthenticated: isConvexAuthenticated, isLoading: isConvexAuthLoading } = useConvexAuth()
@@ -74,7 +74,7 @@ export default function SafeFoodsListScreen() {
   const queryArgs = useMemo(() => {
     const inStock = stockFilter === "all" ? undefined : stockFilter === "in" ? true : false
     return {
-      includeUnsafe: false,
+      includeUnsafe: true, // Show all in manager
       category: activeCategory || undefined,
       texture: activeTexture || undefined,
       temperature: activeTemperature || undefined,
@@ -158,13 +158,7 @@ export default function SafeFoodsListScreen() {
         ListHeaderComponent={
           <View style={themed($header)}>
             <View style={themed($actionsRow)}>
-              <Button text="Back to Grid" preset="reversed" onPress={() => router.back()} />
               <Button text="Add Food" onPress={() => router.push("/safe-foods/create")} />
-              <Button
-                text="View All"
-                preset="reversed"
-                onPress={() => router.push("/safe-foods/all")}
-              />
             </View>
 
             <View style={themed($segmentRow)}>

@@ -1,34 +1,39 @@
-import { internalMutation } from "./_generated/server"
 import { faker } from "@faker-js/faker"
+import { v } from "convex/values"
 
-const CATEGORIES = ["Breakfast", "Lunch", "Dinner", "Snack", "Dessert", "Drink"]
-const TEXTURES = ["Crunchy", "Soft", "Smooth", "Chewy", "Liquid", "Mixed"]
-const TEMPERATURES = ["Hot", "Cold", "Room Temp"]
+import { internalMutation } from "./_generated/server"
 
 export const generateFoods = internalMutation({
   args: {},
+  returns: v.null(),
   handler: async (ctx) => {
-    // Generate 20 fake food items
+    const SENSORY = [
+      "sweet", "savory", "crunchy", "firm", "soft", "chewy",
+      "creamy", "sticky", "dry", "warm", "hot", "cool", "cold", "crumbly",
+    ]
+
+    const PREP = ["minimal prep", "moderate prep", "full prep"]
+    const STOCK = ["in stock", "low stock", "out of stock"]
+
     for (let i = 0; i < 20; i++) {
-      const isSafe = faker.datatype.boolean()
-      
       await ctx.db.insert("foods", {
         name: faker.food.dish(),
         description: faker.food.description(),
-        category: faker.helpers.arrayElement(CATEGORIES),
-        texture: faker.helpers.arrayElement(TEXTURES),
-        temperature: faker.helpers.arrayElement(TEMPERATURES),
-        isSafe: isSafe,
+        isSafe: faker.datatype.boolean(),
         inStock: faker.datatype.boolean(),
         imageUrl: faker.image.urlLoremFlickr({ category: "food", width: 300, height: 300 }),
-        tags: faker.helpers.arrayElements(
-          ["Sweet", "Salty", "Spicy", "Comfort", "Healthy", "Quick"],
-          { min: 1, max: 3 }
-        ),
+
+        // UI-compatible fields
+        tags: faker.helpers.arrayElements(SENSORY, { min: 1, max: 3 }),
+        prepTime: [faker.helpers.arrayElement(PREP)],
+        stockStatus: [faker.helpers.arrayElement(STOCK)],
+
         createdAt: Date.now(),
         updatedAt: Date.now(),
       })
     }
+
     console.log("Successfully added 20 fake food items!")
+    return null
   },
 })
