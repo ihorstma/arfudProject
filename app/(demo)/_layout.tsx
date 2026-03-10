@@ -1,4 +1,5 @@
 import { ViewStyle, TextStyle } from "react-native"
+import { Text } from "react-native"
 import { Tabs } from "expo-router"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -8,6 +9,14 @@ import { EpisodeProvider } from "@/context/EpisodeContext"
 import { translate } from "@/i18n/translate"
 import { useAppTheme } from "@/theme/context"
 import { ThemedStyle } from "@/theme/types"
+
+import { Image } from "react-native" 
+import arfudHome from "@/assets/icons/arfudIconsLightMode/arfudHome.png"
+import arfudDinnerBell from "@/assets/icons/arfudIconsLightMode/arfudDinnerBell.png"
+import arfudJournal from "@/assets/icons/arfudIconsLightMode/arfudJournal.png"
+import arfudOrange from "@/assets/icons/arfudIconsLightMode/arfudOrange.png"
+import arfudPlus from "@/assets/icons/arfudIconsLightMode/arfudPlus.png"
+import arfudShoppingCart from "@/assets/icons/arfudIconsLightMode/arfudShoppingCart.png"
 
 export default function DemoLayout() {
   const { bottom } = useSafeAreaInsets()
@@ -32,12 +41,11 @@ export default function DemoLayout() {
         <Tabs.Screen
           name="home"
           options={{
-            tabBarLabel: "Home",
+            tabBarLabel: "home",
             tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons
-                name="home-outline"
-                color={focused ? colors.tint : colors.tintInactive}
-                size={30}
+              <Image
+                source={arfudHome}
+                style={{ width: 30, height: 30 }}
               />
             ),
           }}
@@ -45,12 +53,11 @@ export default function DemoLayout() {
         <Tabs.Screen
           name="journal"
           options={{
-            tabBarLabel: "Journal",
+            tabBarLabel: "journal",
             tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons
-                name="book-open-outline"
-                color={focused ? colors.tint : colors.tintInactive}
-                size={30}
+              <Image
+                source={arfudJournal}
+                style={{ width: 30, height: 30 }}
               />
             ),
           }}
@@ -58,12 +65,11 @@ export default function DemoLayout() {
         <Tabs.Screen
           name="food-grid"
           options={{
-            tabBarLabel: "Safe Foods",
+            tabBarLabel: "safe foods",
             tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons
-                name="food-apple"
-                color={focused ? colors.tint : colors.tintInactive}
-                size={30}
+              <Image
+                source={arfudDinnerBell}
+                style={{ width: 30, height: 30 }}
               />
             ),
           }}
@@ -71,12 +77,11 @@ export default function DemoLayout() {
         <Tabs.Screen
           name="chat-placeholder"
           options={{
-            tabBarLabel: "Chat",
+            tabBarLabel: "chat",
             tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons
-                name="chat-outline"
-                color={focused ? colors.tint : colors.tintInactive}
-                size={30}
+              <Image
+                source={arfudOrange}
+                style={{ width: 33, height: 33 }}
               />
             ),
           }}
@@ -84,12 +89,15 @@ export default function DemoLayout() {
         <Tabs.Screen
           name="grocery-list"
           options={{
-            tabBarLabel: "List",
+            tabBarLabel: ({ focused }) => (
+              <Text style={{transform: [{ translateX: 4 }]}} >
+                list
+              </Text>
+            ),
             tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons
-                name="cart-outline"
-                color={focused ? colors.tint : colors.tintInactive}
-                size={30}
+              <Image
+                source={arfudShoppingCart}
+                style={{ width: 30, height: 30 }}
               />
             ),
           }}
