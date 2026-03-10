@@ -1,4 +1,5 @@
-import { ViewStyle, TextStyle } from "react-native"
+import { ViewStyle, TextStyle, Pressable } from "react-native"
+import { Text } from "react-native"
 import { Tabs } from "expo-router"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -9,7 +10,18 @@ import { translate } from "@/i18n/translate"
 import { useAppTheme } from "@/theme/context"
 import { ThemedStyle } from "@/theme/types"
 
+import { Image } from "react-native" 
+import arfudHome from "@/assets/icons/arfudIconsLightMode/arfudHome.png"
+import arfudDinnerBell from "@/assets/icons/arfudIconsLightMode/arfudDinnerBell.png"
+import arfudJournal from "@/assets/icons/arfudIconsLightMode/arfudJournal.png"
+import arfudOrange from "@/assets/icons/arfudIconsLightMode/arfudOrange.png"
+import arfudPlus from "@/assets/icons/arfudIconsLightMode/arfudPlus.png"
+import arfudShoppingCart from "@/assets/icons/arfudIconsLightMode/arfudShoppingCart.png"
+import { useState } from "react"
+import { useAddFoodTrigger } from "./store/useAddFoodTrigger"
+
 export default function DemoLayout() {
+  const setTrigger = useAddFoodTrigger((s) => s.setTrigger)
   const { bottom } = useSafeAreaInsets()
   const {
     themed,
@@ -32,12 +44,11 @@ export default function DemoLayout() {
         <Tabs.Screen
           name="home"
           options={{
-            tabBarLabel: "Home",
+            tabBarLabel: "home",
             tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons
-                name="home-outline"
-                color={focused ? colors.tint : colors.tintInactive}
-                size={30}
+              <Image
+                source={arfudHome}
+                style={{ width: 30, height: 30 }}
               />
             ),
           }}
@@ -45,38 +56,50 @@ export default function DemoLayout() {
         <Tabs.Screen
           name="journal"
           options={{
-            tabBarLabel: "Journal",
+            tabBarLabel: "journal",
             tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons
-                name="book-open-outline"
-                color={focused ? colors.tint : colors.tintInactive}
-                size={30}
+              <Image
+                source={arfudJournal}
+                style={{ width: 30, height: 30 }}
               />
             ),
           }}
         />
         <Tabs.Screen
           name="food-grid"
-          options={{
-            tabBarLabel: "Safe Foods",
-            tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons
-                name="food-apple"
-                color={focused ? colors.tint : colors.tintInactive}
-                size={30}
-              />
-            ),
-          }}
+  options={{
+    tabBarLabel: "safe foods",
+    tabBarIcon: ({ focused }) => (
+      <Image
+        source={focused ? arfudPlus : arfudDinnerBell}
+        style={{ width: 30, height: 30 }}
+      />
+    ),
+  }}
+  listeners={({ navigation, route }) => ({
+    tabPress: (e) => {
+      const state = navigation.getState()
+      const isFocused =
+        state.index === state.routes.findIndex(({ key }: { key: string }) => key === route.key)
+
+
+      if (isFocused) {
+        e.preventDefault()
+        // this is where we trigger the modal
+        useAddFoodTrigger.getState().setTrigger(true)
+      }
+    },
+  })}
+    
         />
         <Tabs.Screen
           name="chat-placeholder"
           options={{
-            tabBarLabel: "Chat",
+            tabBarLabel: "chat",
             tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons
-                name="chat-outline"
-                color={focused ? colors.tint : colors.tintInactive}
-                size={30}
+              <Image
+                source={arfudOrange}
+                style={{ width: 33, height: 33 }}
               />
             ),
           }}
@@ -84,12 +107,15 @@ export default function DemoLayout() {
         <Tabs.Screen
           name="grocery-list"
           options={{
-            tabBarLabel: "List",
+            tabBarLabel: ({ focused }) => (
+              <Text style={{transform: [{ translateX: 4 }]}} >
+                list
+              </Text>
+            ),
             tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons
-                name="cart-outline"
-                color={focused ? colors.tint : colors.tintInactive}
-                size={30}
+              <Image
+                source={arfudShoppingCart}
+                style={{ width: 30, height: 30 }}
               />
             ),
           }}
