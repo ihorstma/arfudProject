@@ -24,6 +24,7 @@ import { $styles } from "@/theme/styles"
 import type { ThemedStyle } from "@/theme/types"
 
 import SafeFoodsCreateModal from "@/components/CreateNewSafeFoodModal"
+import EditSafeFoodModal from "@/components/EditSafeFoodModal"
 
 type StockFilter = "all" | "in" | "out"
 type SortMode = "updated" | "name"
@@ -56,6 +57,7 @@ export default function FoodGridScreen() {
   const [sortMode, setSortMode] = useState<SortMode>("updated")
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [editingFood, setEditingFood] = useState<Doc<"foods"> | null>(null)
 
   const deleteFood = useMutation(api.foods.deleteFood)
   const seedFoods = useMutation(api.foods.seedFoods)
@@ -137,7 +139,7 @@ export default function FoodGridScreen() {
     <Pressable
       accessibilityRole="button"
       style={themed($itemContainer)}
-      onPress={() => router.push(`/safe-foods/${item._id}`)}
+      onPress={() => setEditingFood(item)}
     >
       <Image
         source={{
@@ -355,6 +357,15 @@ export default function FoodGridScreen() {
         visible={showCreateModal}
         onClose={() => setShowCreateModal(false)}
       />
+
+      {editingFood && (
+        <EditSafeFoodModal
+          visible={!!editingFood}
+          food={editingFood}
+          onClose={() => setEditingFood(null)}
+        />
+      )}
+
     </Screen>
   )
 }
