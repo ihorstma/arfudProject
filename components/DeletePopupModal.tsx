@@ -22,7 +22,7 @@ export default function DeletePopupModal({
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={themed($backdrop)}>
-        <View style={themed($modal)}>
+        <View style={themed($modal)} backgroundColor="#F5F3F0">
 
           {/* Warning Icon */}
           <View style={{ alignItems: "center", marginBottom: 16 }}>
@@ -35,49 +35,60 @@ export default function DeletePopupModal({
 
           {/* Title */}
           <Text
-            text="Delete this food?"
+            text="are you sure you want to delete this safe food?"
             preset="subheading"
-            style={{ textAlign: "center", color: "white", marginBottom: 8 }}
+            style={{ textAlign: "center", color: "black", marginBottom: 8 }}
           />
 
           {/* Description */}
           <Text
-            text="This action cannot be undone."
-            style={{ textAlign: "center", color: "white", marginBottom: 24 }}
+            text="doing so will permanently remove it from your safe foods and archive."
+            style={{ textAlign: "center", color: "black", marginBottom: 24 }}
           />
 
-          {/* Delete button */}
+          {/* Delete and cancel button */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              width: "100%",
+              gap: 12,
+              marginBottom: 2,
+            }}
+          >
+          <Button
+            text="cancel"
+            onPress={onCancel}
+            style={{
+              flex: 1,
+              backgroundColor: "#828282",
+              minHeight: 40,
+              marginBottom: 10,
+            }}
+            textStyle={{ color: "white" }}
+          />
           <Button
             text="delete"
             onPress={onDelete}
             style={{
+              flex: 1,
               backgroundColor: "#D52004",
               minHeight: 40,
-              marginBottom: 12,
+              marginBottom: 10,
             }}
             textStyle={{ color: "white" }}
           />
+        </View>
+          
 
           {/* Move to archive instead */}
           <Button
             text="move to archive instead"
             onPress={onArchive}
             style={{
-              backgroundColor: "#1B612D",
+              backgroundColor: "#775587",
               minHeight: 40,
               marginBottom: 12,
-            }}
-            textStyle={{ color: "white" }}
-          />
-
-          {/* Cancel */}
-          <Button
-            text="cancel"
-            preset="outline"
-            onPress={onCancel}
-            style={{
-              borderColor: "white",
-              minHeight: 40,
             }}
             textStyle={{ color: "white" }}
           />
