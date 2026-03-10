@@ -1,4 +1,4 @@
-import { ViewStyle, TextStyle } from "react-native"
+import { ViewStyle, TextStyle, Pressable } from "react-native"
 import { Text } from "react-native"
 import { Tabs } from "expo-router"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
@@ -17,8 +17,11 @@ import arfudJournal from "@/assets/icons/arfudIconsLightMode/arfudJournal.png"
 import arfudOrange from "@/assets/icons/arfudIconsLightMode/arfudOrange.png"
 import arfudPlus from "@/assets/icons/arfudIconsLightMode/arfudPlus.png"
 import arfudShoppingCart from "@/assets/icons/arfudIconsLightMode/arfudShoppingCart.png"
+import { useState } from "react"
+import { useAddFoodTrigger } from "./store/useAddFoodTrigger"
 
 export default function DemoLayout() {
+  const setTrigger = useAddFoodTrigger((s) => s.setTrigger)
   const { bottom } = useSafeAreaInsets()
   const {
     themed,
@@ -64,15 +67,30 @@ export default function DemoLayout() {
         />
         <Tabs.Screen
           name="food-grid"
-          options={{
-            tabBarLabel: "safe foods",
-            tabBarIcon: ({ focused }) => (
-              <Image
-                source={focused ? arfudPlus : arfudDinnerBell}
-                style={{ width: 30, height: 30 }}
-              />
-            ),
-          }}
+  options={{
+    tabBarLabel: "safe foods",
+    tabBarIcon: ({ focused }) => (
+      <Image
+        source={focused ? arfudPlus : arfudDinnerBell}
+        style={{ width: 30, height: 30 }}
+      />
+    ),
+  }}
+  listeners={({ navigation, route }) => ({
+    tabPress: (e) => {
+      const state = navigation.getState()
+      const isFocused =
+        state.index === state.routes.findIndex(({ key }: { key: string }) => key === route.key)
+
+
+      if (isFocused) {
+        e.preventDefault()
+        // this is where we trigger the modal
+        useAddFoodTrigger.getState().setTrigger(true)
+      }
+    },
+  })}
+    
         />
         <Tabs.Screen
           name="chat-placeholder"

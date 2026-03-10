@@ -12,6 +12,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { FlashList } from "@shopify/flash-list"
 import { useConvex, useConvexAuth, useMutation, useQuery } from "convex/react"
 import { Searchbar } from "react-native-paper"
+import { useAddFoodTrigger } from "./store/useAddFoodTrigger"
+import { useEffect } from "react"
 
 import { Button } from "@/components/Button"
 import { Card } from "@/components/Card"
@@ -69,6 +71,16 @@ export default function FoodGridScreen() {
     isConvexAuthenticated ? { includeUnsafe: true } : "skip",
   )
 
+  const trigger = useAddFoodTrigger((s) => s.trigger)
+  const setTrigger = useAddFoodTrigger((s) => s.setTrigger)
+
+  useEffect(() => {
+    if (trigger) {
+      setShowCreateModal(true)
+      setTrigger(false)
+    }
+  }, [trigger])
+
   const foods = useMemo(() => {
     const withHeights = (rawFoods ?? []).map((item: Doc<"foods">) => ({
       ...item,
@@ -124,7 +136,7 @@ export default function FoodGridScreen() {
       if (inStock) {
         await markOutOfStock({ id })
       } else {
-        await setInStock({ id, inStock: true })
+        await setInStock({ id, inStock: "In Stock" })
       }
     } catch {
       Alert.alert("Update failed", "Unable to update stock status.")
@@ -340,32 +352,6 @@ export default function FoodGridScreen() {
           }
         />
       )}
-
-      <TouchableOpacity
-        style={themed($fab)}
-        onPress={() => setShowCreateModal(true)}
-        activeOpacity={0.8}
-      >
-        <MaterialCommunityIcons
-          name="plus"
-          size={32}
-          color={theme.colors.palette.neutral900}
-        />
-      </TouchableOpacity>
-
-      <SafeFoodsCreateModal
-        visible={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-      />
-
-      {editingFood && (
-        <EditSafeFoodModal
-          visible={!!editingFood}
-          food={editingFood}
-          onClose={() => setEditingFood(null)}
-        />
-      )}
-
     </Screen>
   )
 }
