@@ -19,6 +19,8 @@ import * as ImagePicker from "expo-image-picker"
 import { Image } from "react-native"
 import { Doc } from "@/convex/_generated/dataModel"
 
+import DeletePopupModal from "./DeletePopupModal"
+
 const availableTags = [
   { label: "sweet", color: "#F28FB0"},
   { label: "savory", color: "#A7C68B"},
@@ -68,6 +70,7 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
     food.inStock ? [food.inStock] : []
   )
   const [isSaving, setIsSaving] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
@@ -290,12 +293,24 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
             paddingVertical: 6,
           }}
           textStyle={{ color: "white" }}
-          onPress={handleDelete}
+          onPress={() => setShowDeleteConfirm(true)}
         />
         </View>
-          </View>
-        </View>
+      </View>
+
+      {/* DELETE CONFIRM POPUP LIVES INSIDE THIS SAME MODAL */}
+      {showDeleteConfirm && (
+        <DeletePopupModal
+          visible={showDeleteConfirm}
+          onCancel={() => setShowDeleteConfirm(false)}
+          onDelete={handleDelete}
+          onArchive={handleArchive}
+        />
+      )}
+
+    </View>
     </Modal>
+    
   )
 }
 
