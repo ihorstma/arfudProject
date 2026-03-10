@@ -25,23 +25,23 @@ const availableTags = [
   { label: "chewy", color: "#EEC036"},
   { label: "creamy", color: "#F8E6D1", textColor: "#6A6767"}, // custom text color as the tag is too pale for white
   { label: "sticky", color: "#D16D8B"},
-  { label: "dry", color: "#BFC5C2"},
+  { label: "dry", color: "#BFC5C2", textColor: "#6A6767"},
   { label: "warm", color: "#DF7471"},
   { label: "hot", color: "#FF4B3E"},
   { label: "cool", color: "#4F7DA7"},
-  { label: "cold", color: "#A5D8FF"},
+  { label: "cold", color: "#A5D8FF", textColor: "#6A6767"},
   { label: "crumbly", color: "#f7a663d9"}, // no figma color, subject to change
 ]
 
 const prepTimeTags = [
-  { label: "minimal prep", color: "#E0C5F0" },
+  { label: "minimal prep", color: "#E0C5F0", textColor: "#6A6767" },
   { label: "moderate prep", color: "#9D7BAE" },
   { label: "full prep", color: "#775587" },
 ]
 
 const stockTags = [
-  { label: "in stock", color: "#A5D721" },
-  { label: "low stock", color: "#FFF017", textColor: "#6A6767"},  // custom text color as the tag is too pale for white
+  { label: "in stock", color: "#A5D721", textColor: "#6A6767" },
+  { label: "low stock", color: "#FFF017", textColor: "#6A6767" },  // custom text color as the tag is too pale for white
   { label: "out of stock", color: "#BF503F" }
 ]
 
@@ -139,10 +139,11 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
           </View>
 
           {/* Form Fields */}
-          <TextField label="name" value={name} onChangeText={setName} containerStyle={themed($field)} />
+          <Text text="name"  preset="subheading" style={{ color: "white" }} />
+          <TextField value={name} onChangeText={setName} containerStyle={themed($field)} />
 
           {/* Sensory Tag Selector */}
-          <Text text="sensory tags" preset="subheading" />
+          <Text text="sensory tags" preset="subheading" style={{ color: "white" }}/>
           <View style={themed($tagContainer)}>
             {availableTags.map(tag => {
               const active = selectedTags.includes(tag.label)
@@ -164,10 +165,11 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
           </View>
 
           {/* Prep Time Tag Selector */}
-          <Text text="prep time" preset="subheading" />
+          <Text text="prep time" preset="subheading" style={{ color: "white" }} />
           <View style={themed($tagContainer)}>
             {prepTimeTags.map(tag => {
               const active = selectedPrepTags.includes(tag.label)
+              const textColor = tag.textColor ?? "white"
               return (
                 <Pressable 
                   key={tag.label} 
@@ -176,8 +178,8 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
                 >
                 {/* add the +/- depending on if the tag is active or not */}
                   <View style={{ flexDirection: "row", alignItems: "center"}}>
-                    <Text text={tag.label} style={{ color: "white" } } />
-                    <Text text={ active ? " -" : " +" } style={{ color: "white" }}/>
+                    <Text text={tag.label} style={{ color: textColor } } />
+                    <Text text={ active ? " -" : " +" } style={{ color: textColor }}/>
                   </View>
                 </Pressable>
               )
@@ -185,7 +187,7 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
           </View>
 
           {/* Stock Tag Selector */}
-          <Text text="add stock" preset="subheading" />
+          <Text text="add stock" preset="subheading" style={{ color: "white" }}/>
           <View style={themed($tagContainer)}>
             {stockTags.map(tag => {
               const active = selectedStockTags.includes(tag.label)
@@ -278,9 +280,9 @@ const $tagContainer: ThemedStyle<ViewStyle> = () => ({
 })
 
 const $tag = (active: boolean, color: string): ThemedStyle<ViewStyle> => ({ colors }) => ({ 
-  paddingVertical: 2, 
-  paddingHorizontal: 6, 
-  borderRadius: 2, 
+  paddingVertical: 4, 
+  paddingHorizontal: 8, 
+  borderRadius: 3, 
   backgroundColor: color, 
   flexDirection: "row",
   alignItems: "center",
