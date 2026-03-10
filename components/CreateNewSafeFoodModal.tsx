@@ -15,6 +15,8 @@ import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 import { useCustomAlert } from "@/components/CustomAlert"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
+import * as ImagePicker from "expo-image-picker"
+import { Image } from "react-native"
 
 const availableTags = [
   { label: "sweet", color: "#F28FB0"},
@@ -120,6 +122,18 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
     }
   }
 
+  const pickImage = async () => {
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    quality: 0.8,
+  })
+
+  if (!result.canceled) {
+    setImageUrl(result.assets[0].uri)
+  }
+}
+
   return (
     <Modal
       visible={visible}
@@ -207,22 +221,33 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
               )
             })}
           </View>
-
-          <TextField label="image url" value={imageUrl} onChangeText={setImageUrl} autoCapitalize="none" containerStyle={themed($field)} />
+            <View style={{ alignItems: "flex-start", width: "100%", marginTop: 16 }}>
+              <Button
+                text="upload image"
+                style={{
+                  borderColor: "#C7D300",
+                  borderWidth: 2,
+                  backgroundColor: "#C7D300",
+                  width: 160,
+                  minHeight: 32,
+                  paddingVertical: 6,
+                }}
+                textStyle={{ color: "white" }}
+                onPress={pickImage}
+              />
           </View>
-
           {/* add new safe food button */}
-          <View style={themed($action)}>
+          <View style={{ width: "100%", marginTop: 10 }}>
             <Button 
               text="add new safe food" 
               onPress={handleSave} 
               disabled={isSaving} 
               preset="filled"
-              style={{ backgroundColor: "#FF9400" }}
+              style={{ backgroundColor: "#FF9400", minHeight: 40, }}
               textStyle={{ color: "white" }}
             />
           </View>
-
+          </View>
         </View>
     </Modal>
   )
@@ -237,6 +262,7 @@ const $backdrop: ThemedStyle<ViewStyle> = () => ({
 
 const $modal: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({ 
   width: "90%", 
+  height: "auto",
   backgroundColor: colors.createNewFoodModalBackground, 
   paddingHorizontal: spacing.lg, 
   paddingBottom: spacing.lg,
