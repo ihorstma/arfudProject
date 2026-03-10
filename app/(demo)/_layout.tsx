@@ -68,7 +68,7 @@ export default function DemoLayout() {
             tabBarLabel: "safe foods",
             tabBarIcon: ({ focused }) => (
               <Image
-                source={arfudDinnerBell}
+                source={focused ? arfudPlus : arfudDinnerBell}
                 style={{ width: 30, height: 30 }}
               />
             ),
