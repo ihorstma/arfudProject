@@ -5,7 +5,7 @@ import { authComponent } from "./auth"
 
 const listFoodsArgs = {
   includeUnsafe: v.optional(v.boolean()),
-  inStock: v.optional(v.boolean()),
+  inStock: v.optional(v.string()),
 }
 
 const foodValidator = v.object({
@@ -15,7 +15,7 @@ const foodValidator = v.object({
   name: v.string(),
   description: v.optional(v.string()),
   isSafe: v.boolean(),
-  inStock: v.boolean(),
+  inStock: v.optional(v.string()), // "in_stock", "low_stock", "out_of_stock"
   imageUrl: v.optional(v.string()),
   tags: v.optional(v.array(v.string())),
   prepTime: v.optional(v.array(v.string())),
@@ -34,7 +34,7 @@ const requireOwnerId = async (ctx: any) => {
 export const listFoods = query({
   args: {
     includeUnsafe: v.optional(v.boolean()),
-    inStock: v.optional(v.boolean()),
+    inStock: v.optional(v.string()),
   },
   returns: v.array(foodValidator),
   handler: async (ctx, args) => {
@@ -105,7 +105,7 @@ export const getFoodById = query({
 const addFoodArgs = {
   name: v.string(),
   isSafe: v.boolean(),
-  inStock: v.boolean(),
+  inStock: v.optional(v.string()), // "in_stock", "low_stock", "out_of_stock"
   imageUrl: v.optional(v.string()),
   tags: v.optional(v.array(v.string())),
   prepTime: v.optional(v.array(v.string())),
@@ -132,7 +132,7 @@ const updateFoodArgs = {
   id: v.id("foods"),
   name: v.optional(v.string()),
   isSafe: v.optional(v.boolean()),
-  inStock: v.optional(v.boolean()),
+  inStock: v.optional(v.string()),
   imageUrl: v.optional(v.string()),
   tags: v.optional(v.array(v.string())),
   prepTime: v.optional(v.array(v.string())),
@@ -167,7 +167,7 @@ export const deleteFood = mutation({
 })
 
 export const setInStock = mutation({
-  args: { id: v.id("foods"), inStock: v.boolean() },
+  args: { id: v.id("foods"), inStock: v.string() },
   returns: v.null(),
   handler: async (ctx, args) => {
     const ownerId = await requireOwnerId(ctx)
@@ -182,6 +182,7 @@ export const setInStock = mutation({
   },
 })
 
+
 export const markOutOfStock = mutation({
   args: { id: v.id("foods") },
   returns: v.null(),
@@ -191,12 +192,13 @@ export const markOutOfStock = mutation({
     if (!existing || existing.ownerId !== ownerId) throw new Error("Not found")
 
     await ctx.db.patch(args.id, {
-      inStock: false,
+      inStock: "out of stock",
       updatedAt: Date.now(),
     })
     return null
   },
 })
+
 
 
 export const seedFoods = mutation({
@@ -222,7 +224,7 @@ export const seedFoods = mutation({
         name,
         description: `Delicious ${name}`,
         isSafe: Math.random() > 0.3,
-        inStock: Math.random() > 0.2,
+        inStock: STOCK[Math.floor(Math.random() * STOCK.length)],
         imageUrl: `https://loremflickr.com/300/300/food?lock=${i}`,
         // optional:
         // tags: [...],

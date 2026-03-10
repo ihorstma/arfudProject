@@ -20,7 +20,11 @@ export const generateFoods = internalMutation({
         name: faker.food.dish(),
         description: faker.food.description(),
         isSafe: faker.datatype.boolean(),
-        inStock: faker.datatype.boolean(),
+        inStock: faker.helpers.arrayElement([
+          "in stock",
+          "low stock",
+          "out of stock",
+        ]),
         imageUrl: faker.image.urlLoremFlickr({ category: "food", width: 300, height: 300 }),
 
         // UI-compatible fields

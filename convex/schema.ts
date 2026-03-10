@@ -7,7 +7,7 @@ export default defineSchema({
     name: v.string(),
     description: v.optional(v.string()),
     isSafe: v.boolean(),
-    inStock: v.boolean(),
+    inStock: v.optional(v.string()), // "in_stock", "low_stock", "out_of_stock"
     imageUrl: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),        // sensory tags
     prepTime: v.optional(v.array(v.string())),    // prep time tags

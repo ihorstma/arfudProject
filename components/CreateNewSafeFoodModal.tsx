@@ -63,7 +63,6 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
   const { showAlert } = useCustomAlert()
 
   const [name, setName] = useState("")
-  const [isSafeText, setIsSafeText] = useState("true")
   const [imageUrl, setImageUrl] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [selectedPrepTags, setSelectedPrepTags] = useState<string[]>([])
@@ -90,7 +89,6 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
 
   const resetForm = () => {
     setName("")
-    setIsSafeText("true")
     setImageUrl("")
   }
 
@@ -100,18 +98,14 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
       return
     }
 
-    const parsedSafe = parseBoolean(isSafeText)
+    const parsedInStock = selectedStockTags[0] ?? null
 
-    if (parsedSafe === null) {
-      showAlert("Invalid values", "Use true/false for Safe.")
-      return
-    }
 
     setIsSaving(true)
     try {
       await addFood({
         name: name.trim(),
-        isSafe: parsedSafe,
+        isSafe: true,
         inStock: parsedInStock,
         imageUrl: imageUrl.trim() || undefined,
         tags: selectedTags,
@@ -212,7 +206,6 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
             })}
           </View>
 
-          <TextField label="archive (true/false)" value={isSafeText} onChangeText={setIsSafeText} autoCapitalize="none" containerStyle={themed($field)} />
           <TextField label="image url" value={imageUrl} onChangeText={setImageUrl} autoCapitalize="none" containerStyle={themed($field)} />
           </View>
 
@@ -285,9 +278,9 @@ const $tagContainer: ThemedStyle<ViewStyle> = () => ({
 })
 
 const $tag = (active: boolean, color: string): ThemedStyle<ViewStyle> => ({ colors }) => ({ 
-  paddingVertical: 4, 
-  paddingHorizontal: 8, 
-  borderRadius: 3, 
+  paddingVertical: 2, 
+  paddingHorizontal: 6, 
+  borderRadius: 2, 
   backgroundColor: color, 
   flexDirection: "row",
   alignItems: "center",
