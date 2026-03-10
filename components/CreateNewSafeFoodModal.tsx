@@ -15,6 +15,8 @@ import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 import { useCustomAlert } from "@/components/CustomAlert"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
+import * as ImagePicker from "expo-image-picker"
+import { Image } from "react-native"
 
 const availableTags = [
   { label: "sweet", color: "#F28FB0"},
@@ -25,23 +27,23 @@ const availableTags = [
   { label: "chewy", color: "#EEC036"},
   { label: "creamy", color: "#F8E6D1", textColor: "#6A6767"}, // custom text color as the tag is too pale for white
   { label: "sticky", color: "#D16D8B"},
-  { label: "dry", color: "#BFC5C2"},
+  { label: "dry", color: "#BFC5C2", textColor: "#6A6767"},
   { label: "warm", color: "#DF7471"},
   { label: "hot", color: "#FF4B3E"},
   { label: "cool", color: "#4F7DA7"},
-  { label: "cold", color: "#A5D8FF"},
+  { label: "cold", color: "#A5D8FF", textColor: "#6A6767"},
   { label: "crumbly", color: "#f7a663d9"}, // no figma color, subject to change
 ]
 
 const prepTimeTags = [
-  { label: "minimal prep", color: "#E0C5F0" },
+  { label: "minimal prep", color: "#E0C5F0", textColor: "#6A6767" },
   { label: "moderate prep", color: "#9D7BAE" },
   { label: "full prep", color: "#775587" },
 ]
 
 const stockTags = [
-  { label: "in stock", color: "#A5D721" },
-  { label: "low stock", color: "#FFF017", textColor: "#6A6767"},  // custom text color as the tag is too pale for white
+  { label: "in stock", color: "#A5D721", textColor: "#6A6767" },
+  { label: "low stock", color: "#FFF017", textColor: "#6A6767" },  // custom text color as the tag is too pale for white
   { label: "out of stock", color: "#BF503F" }
 ]
 
@@ -63,7 +65,6 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
   const { showAlert } = useCustomAlert()
 
   const [name, setName] = useState("")
-  const [isSafeText, setIsSafeText] = useState("true")
   const [imageUrl, setImageUrl] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [selectedPrepTags, setSelectedPrepTags] = useState<string[]>([])
@@ -90,7 +91,6 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
 
   const resetForm = () => {
     setName("")
-    setIsSafeText("true")
     setImageUrl("")
   }
 
@@ -100,18 +100,14 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
       return
     }
 
-    const parsedSafe = parseBoolean(isSafeText)
+    const parsedInStock = selectedStockTags[0] ?? null
 
-    if (parsedSafe === null) {
-      showAlert("Invalid values", "Use true/false for Safe.")
-      return
-    }
 
     setIsSaving(true)
     try {
       await addFood({
         name: name.trim(),
-        isSafe: parsedSafe,
+        isSafe: true,
         inStock: parsedInStock,
         imageUrl: imageUrl.trim() || undefined,
         tags: selectedTags,
@@ -125,6 +121,18 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
       setIsSaving(false)
     }
   }
+
+  const pickImage = async () => {
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    quality: 0.8,
+  })
+
+  if (!result.canceled) {
+    setImageUrl(result.assets[0].uri)
+  }
+}
 
   return (
     <Modal
@@ -145,10 +153,11 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
           </View>
 
           {/* Form Fields */}
-          <TextField label="name" value={name} onChangeText={setName} containerStyle={themed($field)} />
+          <Text text="name"  preset="subheading" style={{ color: "white" }} />
+          <TextField value={name} onChangeText={setName} containerStyle={themed($field)} />
 
           {/* Sensory Tag Selector */}
-          <Text text="sensory tags" preset="subheading" />
+          <Text text="sensory tags" preset="subheading" style={{ color: "white" }}/>
           <View style={themed($tagContainer)}>
             {availableTags.map(tag => {
               const active = selectedTags.includes(tag.label)
@@ -170,10 +179,11 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
           </View>
 
           {/* Prep Time Tag Selector */}
-          <Text text="prep time" preset="subheading" />
+          <Text text="prep time" preset="subheading" style={{ color: "white" }} />
           <View style={themed($tagContainer)}>
             {prepTimeTags.map(tag => {
               const active = selectedPrepTags.includes(tag.label)
+              const textColor = tag.textColor ?? "white"
               return (
                 <Pressable 
                   key={tag.label} 
@@ -182,8 +192,8 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
                 >
                 {/* add the +/- depending on if the tag is active or not */}
                   <View style={{ flexDirection: "row", alignItems: "center"}}>
-                    <Text text={tag.label} style={{ color: "white" } } />
-                    <Text text={ active ? " -" : " +" } style={{ color: "white" }}/>
+                    <Text text={tag.label} style={{ color: textColor } } />
+                    <Text text={ active ? " -" : " +" } style={{ color: textColor }}/>
                   </View>
                 </Pressable>
               )
@@ -191,7 +201,7 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
           </View>
 
           {/* Stock Tag Selector */}
-          <Text text="add stock" preset="subheading" />
+          <Text text="add stock" preset="subheading" style={{ color: "white" }}/>
           <View style={themed($tagContainer)}>
             {stockTags.map(tag => {
               const active = selectedStockTags.includes(tag.label)
@@ -211,23 +221,33 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
               )
             })}
           </View>
-
-          <TextField label="archive (true/false)" value={isSafeText} onChangeText={setIsSafeText} autoCapitalize="none" containerStyle={themed($field)} />
-          <TextField label="image url" value={imageUrl} onChangeText={setImageUrl} autoCapitalize="none" containerStyle={themed($field)} />
+            <View style={{ alignItems: "flex-start", width: "100%", marginTop: 16 }}>
+              <Button
+                text="upload image"
+                style={{
+                  borderColor: "#C7D300",
+                  borderWidth: 2,
+                  backgroundColor: "#C7D300",
+                  width: 160,
+                  minHeight: 32,
+                  paddingVertical: 6,
+                }}
+                textStyle={{ color: "white" }}
+                onPress={pickImage}
+              />
           </View>
-
           {/* add new safe food button */}
-          <View style={themed($action)}>
+          <View style={{ width: "100%", marginTop: 10 }}>
             <Button 
               text="add new safe food" 
               onPress={handleSave} 
               disabled={isSaving} 
               preset="filled"
-              style={{ backgroundColor: "#FF9400" }}
+              style={{ backgroundColor: "#FF9400", minHeight: 40, }}
               textStyle={{ color: "white" }}
             />
           </View>
-
+          </View>
         </View>
     </Modal>
   )
@@ -242,6 +262,7 @@ const $backdrop: ThemedStyle<ViewStyle> = () => ({
 
 const $modal: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({ 
   width: "90%", 
+  height: "auto",
   backgroundColor: colors.createNewFoodModalBackground, 
   paddingHorizontal: spacing.lg, 
   paddingBottom: spacing.lg,
