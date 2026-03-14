@@ -151,7 +151,8 @@ export default function FoodGridScreen() {
     <Pressable
       accessibilityRole="button"
       style={themed($itemContainer)}
-      onPress={() => setEditingFood(item)}
+      onPress={() => {
+        setEditingFood(item)}}
     >
       <Image
         source={{
@@ -350,6 +351,18 @@ export default function FoodGridScreen() {
               />
             </View>
           }
+        />
+      )}
+      <SafeFoodsCreateModal
+        visible={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
+
+      {editingFood && (
+        <EditSafeFoodModal
+          visible={!!editingFood}
+          food={editingFood}
+          onClose={() => setEditingFood(null)}
         />
       )}
     </Screen>
