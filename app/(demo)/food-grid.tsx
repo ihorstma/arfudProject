@@ -28,7 +28,7 @@ import type { ThemedStyle } from "@/theme/types"
 import SafeFoodsCreateModal from "@/components/CreateNewSafeFoodModal"
 import EditSafeFoodModal from "@/components/EditSafeFoodModal"
 
-type StockFilter = "all" | "in" | "out"
+type StockFilter = "all" | "in" | "low" | "out"
 type SortMode = "updated" | "name"
 type ViewMode = "grid" | "list"
 
@@ -88,15 +88,20 @@ export default function FoodGridScreen() {
     }))
 
     const withFilters = withHeights.filter((item) => {
-      if (stockFilter === "in" && !item.inStock) return false
-      if (stockFilter === "out" && item.inStock) return false
+      if (stockFilter === "in" && item.inStock !== "in stock") return false
+      if (stockFilter === "low" && item.inStock !== "low stock") return false
+      if (stockFilter === "out" && item.inStock !== "out of stock") return false
+
       if (
         searchQuery &&
         !item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      ) {
         return false
+      }
+
       return true
     })
+
 
     return withFilters.sort((a, b) => {
       if (sortMode === "name") return a.name.localeCompare(b.name)
@@ -260,7 +265,7 @@ export default function FoodGridScreen() {
         </View>
 
         <View style={themed($segmentRow)}>
-          {(["all", "in", "out"] as const).map((item) => (
+          {(["all", "in", "low", "out"] as const).map((item) => (
             <TouchableOpacity
               key={item}
               style={themed([
@@ -271,7 +276,10 @@ export default function FoodGridScreen() {
             >
               <Text
                 text={
-                  item === "all" ? "All" : item === "in" ? "In Stock" : "Out"
+                  item === "in" ? "In Stock" :
+                  item === "low" ? "Low Stock" :
+                  item === "out" ? "Out of Stock" :
+                  "All"
                 }
                 style={themed([
                   $segmentText,
