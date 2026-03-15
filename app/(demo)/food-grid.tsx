@@ -28,7 +28,7 @@ import type { ThemedStyle } from "@/theme/types"
 import SafeFoodsCreateModal from "@/components/CreateNewSafeFoodModal"
 import EditSafeFoodModal from "@/components/EditSafeFoodModal"
 
-type StockFilter = "all" | "in" | "low" | "out"
+type StockFilter = "all" | "in stock" | "low stock" | "out of stock"
 type SortMode = "updated" | "name"
 type ViewMode = "grid" | "list"
 
@@ -67,9 +67,14 @@ export default function FoodGridScreen() {
   const markOutOfStock = useMutation(api.foods.markOutOfStock)
 
   const rawFoods = useQuery(
-    api.foods.listFoods,
-    isConvexAuthenticated ? { includeUnsafe: true } : "skip",
-  )
+  api.foods.listFoods,
+  isConvexAuthenticated
+    ? {
+        includeUnsafe: true,
+        inStock: stockFilter === "all" ? undefined : stockFilter,
+      }
+    : "skip",
+)
 
   const trigger = useAddFoodTrigger((s) => s.trigger)
   const setTrigger = useAddFoodTrigger((s) => s.setTrigger)
@@ -82,32 +87,22 @@ export default function FoodGridScreen() {
   }, [trigger])
 
   const foods = useMemo(() => {
-    const withHeights = (rawFoods ?? []).map((item: Doc<"foods">) => ({
+    const withHeights = (rawFoods ?? []).map(item => ({
       ...item,
       height: getRandomHeight(item._id),
     }))
 
-    const withFilters = withHeights.filter((item) => {
-      if (stockFilter === "in" && item.inStock !== "in stock") return false
-      if (stockFilter === "low" && item.inStock !== "low stock") return false
-      if (stockFilter === "out" && item.inStock !== "out of stock") return false
+    const withSearch = withHeights.filter(item =>
+      searchQuery
+        ? item.name.toLowerCase().includes(searchQuery.toLowerCase())
+        : true
+    )
 
-      if (
-        searchQuery &&
-        !item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
-        return false
-      }
-
-      return true
-    })
-
-
-    return withFilters.sort((a, b) => {
+    return withSearch.sort((a, b) => {
       if (sortMode === "name") return a.name.localeCompare(b.name)
       return b.updatedAt - a.updatedAt
-    })
-  }, [rawFoods, searchQuery, sortMode, stockFilter])
+      })
+    }, [rawFoods, searchQuery, sortMode])
 
   const onRefresh = async () => {
     if (!isConvexAuthenticated) return
@@ -265,7 +260,7 @@ export default function FoodGridScreen() {
         </View>
 
         <View style={themed($segmentRow)}>
-          {(["all", "in", "low", "out"] as const).map((item) => (
+          {(["all", "in stock", "low stock", "out of stock"] as const).map((item) => (
             <TouchableOpacity
               key={item}
               style={themed([
@@ -276,9 +271,9 @@ export default function FoodGridScreen() {
             >
               <Text
                 text={
-                  item === "in" ? "In Stock" :
-                  item === "low" ? "Low Stock" :
-                  item === "out" ? "Out of Stock" :
+                  item === "in stock" ? "In Stock" :
+                  item === "low stock" ? "Low Stock" :
+                  item === "out of stock" ? "Out of Stock" :
                   "All"
                 }
                 style={themed([
