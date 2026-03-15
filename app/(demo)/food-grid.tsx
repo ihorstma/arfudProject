@@ -27,6 +27,7 @@ import type { ThemedStyle } from "@/theme/types"
 
 import SafeFoodsCreateModal from "@/components/CreateNewSafeFoodModal"
 import EditSafeFoodModal from "@/components/EditSafeFoodModal"
+import { v } from "convex/values"
 
 type StockFilter = "all" | "in stock" | "low stock" | "out of stock"
 type SortMode = "updated" | "name"
@@ -57,7 +58,8 @@ export default function FoodGridScreen() {
 
   const [viewMode, setViewMode] = useState<ViewMode>("grid")
   const [searchQuery, setSearchQuery] = useState("")
-  const [stockFilter, setStockFilter] = useState<StockFilter>("all")
+  const [stockFilter, setStockFilter] = useState<string[]>([])
+  const [prepFilter, setPrepFilter] = useState<string[]>([])
   const [sortMode, setSortMode] = useState<SortMode>("updated")
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -70,14 +72,11 @@ export default function FoodGridScreen() {
   const [topTab, setTopTab] = useState<TopTab>("all")
 
   const rawFoods = useQuery(
-  api.foods.listFoods,
-  isConvexAuthenticated
-    ? {
-        includeUnsafe: true,
-        inStock: stockFilter === "all" ? undefined : stockFilter,
-      }
-    : "skip",
-)
+    api.foods.listFoods,
+    isConvexAuthenticated
+      ? { includeUnsafe: true }
+      : "skip",
+  )
 
   const trigger = useAddFoodTrigger((s) => s.trigger)
   const setTrigger = useAddFoodTrigger((s) => s.setTrigger)
@@ -90,22 +89,36 @@ export default function FoodGridScreen() {
   }, [trigger])
 
   const foods = useMemo(() => {
-    const withHeights = (rawFoods ?? []).map(item => ({
+    let list = (rawFoods ?? []).map(item => ({
       ...item,
       height: getRandomHeight(item._id),
     }))
 
-    const withSearch = withHeights.filter(item =>
-      searchQuery
-        ? item.name.toLowerCase().includes(searchQuery.toLowerCase())
-        : true
-    )
+    // --- SEARCH TAB ---
+    if (topTab === "search" && searchQuery) {
+      list = list.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )}
 
-    return withSearch.sort((a, b) => {
+    // --- FILTER TAB: Stock ---
+    if (topTab === "filter" && stockFilter.length > 0) {
+      list = list.filter(item => 
+        stockFilter.includes(item.inStock ?? "")
+    )}
+
+    // --- FILTER TAB: Prep ---
+    if (topTab === "filter" && prepFilter.length > 0) {
+      list = list.filter(item =>
+        item.prepTime?.some((tag) => prepFilter.includes(tag))
+    )}
+
+    // --- SORTING ---
+    return list.sort((a, b) => {
       if (sortMode === "name") return a.name.localeCompare(b.name)
       return b.updatedAt - a.updatedAt
-      })
-    }, [rawFoods, searchQuery, sortMode])
+    })
+  }, [rawFoods, topTab, searchQuery, stockFilter, prepFilter, sortMode])
+
 
   const onRefresh = async () => {
     if (!isConvexAuthenticated) return
@@ -301,37 +314,83 @@ export default function FoodGridScreen() {
       {topTab === "filter" && (
         <View style={{ gap: 12 }}>
 
-          {/* Stock filter */}
+          {/* Stock Filter */}
           <View style={themed($segmentRow)}>
-            {(["all", "in stock", "low stock", "out of stock"] as const).map((item) => (
-              <TouchableOpacity
+            {(["in stock", "low stock", "out of stock"] as const).map((item) => {
+              const isActive = stockFilter.includes(item)
+
+              return (
+                <TouchableOpacity
                 key={item}
                 style={themed([
                   $segmentButton,
-                  stockFilter === item && $segmentButtonActive,
+                  isActive && $segmentButtonActive,
                 ])}
-                onPress={() => setStockFilter(item)}
+                onPress={() =>
+                  setStockFilter((prev) =>
+                    isActive
+                      ? prev.filter((v) => v !== item) // remove
+                      : [...prev, item] // add
+                  )
+                }
               >
-                <Text
-                  text={
-                    item === "in stock"
-                      ? "In Stock"
-                      : item === "low stock"
-                      ? "Low Stock"
-                      : item === "out of stock"
-                      ? "Out of Stock"
-                      : "All"
-                  }
-                  style={themed([
-                    $segmentText,
-                    stockFilter === item && $segmentTextActive,
-                  ])}
-                />
-              </TouchableOpacity>
-            ))}
-          </View>
+            <Text
+              text={
+                item === "in stock"
+                  ? "In Stock"
+                  : item === "low stock"
+                  ? "Low Stock"
+                  : "Out of Stock"
+              }
+              style={themed([
+                $segmentText,
+                isActive && $segmentTextActive,
+              ])}
+            />
+          </TouchableOpacity>
+        )
+      })}
+    </View>
 
-          {/* Prep filter goes here */}
+          {/* Prep Time Filter */}
+          <View style={themed($segmentRow)}>
+            {(["minimal prep", "moderate prep", "full prep"] as const).map((item) => {
+              const isActive = prepFilter.includes(item)
+
+              return (
+                <TouchableOpacity
+                  key={item}
+                  style={themed([
+                   $segmentButton,
+                  isActive && $segmentButtonActive,
+              ])}
+              onPress={() =>
+                  setPrepFilter((prev) =>
+                    isActive
+                      ? prev.filter((v) => v !== item) // remove
+                      : [...prev, item] // add
+                  )
+                }
+            >
+              <Text
+                text={
+                  item === "minimal prep"
+                  ? "Minimal Prep"
+                  : item === "moderate prep"
+                  ? "Moderate Prep"
+                  : "Full Prep"
+                }
+                style={themed([
+                  $segmentText,
+                  isActive && $segmentTextActive,
+                ])}
+              />
+            </TouchableOpacity>
+          )
+        })}
+      </View>
+
+
           {/* Sensory filter goes here */}
         </View>
       )}
