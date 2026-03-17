@@ -75,11 +75,16 @@ export default function FoodGridScreen() {
   const [topTab, setTopTab] = useState<TopTab>("all")
 
   const rawFoods = useQuery(
-    api.foods.listFoods,
-    isConvexAuthenticated
-      ? { includeUnsafe: true }
-      : "skip",
-  )
+  api.foods.listFoods,
+  isConvexAuthenticated
+    ? {
+        includeUnsafe: true,
+        inStock: undefined, // you’re filtering client-side now
+        search: topTab === "search" ? searchQuery : undefined,
+      }
+    : "skip",
+)
+
 
   const trigger = useAddFoodTrigger((s) => s.trigger)
   const setTrigger = useAddFoodTrigger((s) => s.setTrigger)
@@ -96,12 +101,6 @@ export default function FoodGridScreen() {
       ...item,
       height: getRandomHeight(item._id),
     }))
-
-    // --- SEARCH TAB ---
-    if (topTab === "search" && searchQuery) {
-      list = list.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )}
 
     // --- FILTER TAB: Stock ---
     if (topTab === "filter" && stockFilter.length > 0) {
