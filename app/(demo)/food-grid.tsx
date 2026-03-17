@@ -257,30 +257,29 @@ export default function FoodGridScreen() {
 
     {/* --- TOP TABS (All / Search / Filter) --- */}
     <View style={themed($topTabsRow)}>
-      {(["all", "search", "filter"] as const).map((tab) => (
-        <TouchableOpacity
-          key={tab}
-          onPress={() => setTopTab(tab)}
-          style={themed([
-            $topTabButton,
-            topTab === tab && $topTabButtonActive,
-          ])}
-        >
-          <Text
-            text={
-              tab === "all"
-                ? "All"
-                : tab === "search"
-                ? "Search"
-                : "Filter"
-            }
-            style={themed([
-              $topTabText,
-              topTab === tab && $topTabTextActive,
-            ])}
-          />
-        </TouchableOpacity>
-      ))}
+      {(["all", "search", "filter"] as const).map((tab) => {
+        const active = topTab === tab
+        
+        return (
+          <TouchableOpacity
+            key={tab}
+            onPress={() => setTopTab(tab)}
+            style={themed($topTabTouchable)}
+          >
+            <Text
+              text={
+                tab === "all"
+                  ? "all"
+                  : tab === "search"
+                  ? "search"
+                  : "filter"
+              }
+              style={themed($topTabTextNew(active))}
+            />
+            {active && <View style={themed($topTabUnderline)} />}
+          </TouchableOpacity>
+          )
+      })}
     </View>
 
     {/* --- HEADER CONTENT CHANGES BASED ON TAB --- */}
@@ -487,26 +486,26 @@ const $topTabsRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   paddingTop: spacing.sm,
 })
 
-const $topTabButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+const $topTabTouchable: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   paddingVertical: spacing.xs,
-  paddingHorizontal: spacing.md,
-  borderRadius: 12,
-  backgroundColor: colors.palette.neutral200,
+  alignItems: "center",
 })
 
-const $topTabButtonActive: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  backgroundColor: colors.tint,
-})
+const $topTabTextNew = (active: boolean): ThemedStyle<TextStyle> =>
+  ({ colors, typography }) => ({
+    fontFamily: typography.primary.medium,
+    fontSize: 16,
+    color: colors.text, // black
+    opacity: active ? 1 : 0.5,
+  })
 
-const $topTabText: ThemedStyle<TextStyle> = ({ colors }) => ({
-  color: colors.text,
-  fontSize: 14,
+const $topTabUnderline: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  height: 2,
+  width: "100%",
+  backgroundColor: colors.text, // black underline
+  marginTop: 2,
+  borderRadius: 1,
 })
-
-const $topTabTextActive: ThemedStyle<TextStyle> = ({ colors }) => ({
-  color: colors.palette.neutral100,
-})
-
 
 const $listContent: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   paddingHorizontal: spacing.sm,
