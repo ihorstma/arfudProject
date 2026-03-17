@@ -28,7 +28,8 @@ import type { ThemedStyle } from "@/theme/types"
 import SafeFoodsCreateModal from "@/components/CreateNewSafeFoodModal"
 import EditSafeFoodModal from "@/components/EditSafeFoodModal"
 import { v } from "convex/values"
-import { availableTags } from "@/components/FoodTags"
+import { availableTags, prepTimeTags, stockTags } from "@/components/FoodTagsInfo/FoodTags"
+import { TagPill } from "@/components/FoodTagsInfo/TagPill"
 
 type SortMode = "updated" | "name"
 type ViewMode = "grid" | "list"
@@ -323,116 +324,71 @@ export default function FoodGridScreen() {
         <View style={{ gap: 12 }}>
 
           {/* Stock Filter */}
-          <View style={themed($segmentRow)}>
-            {(["in stock", "low stock", "out of stock"] as const).map((item) => {
-              const isActive = stockFilter.includes(item)
-
+          <View style={[themed($segmentRow), { flexWrap: "wrap" }]}>
+            {stockTags.map(tag => {
+              const active = stockFilter.includes(tag.label)
+    
               return (
-                <TouchableOpacity
-                key={item}
-                style={themed([
-                  $segmentButton,
-                  isActive && $segmentButtonActive,
-                ])}
-                onPress={() =>
-                  setStockFilter((prev) =>
-                    isActive
-                      ? prev.filter((v) => v !== item) // remove
-                      : [...prev, item] // add
-                  )
-                }
-              >
-            <Text
-              text={
-                item === "in stock"
-                  ? "In Stock"
-                  : item === "low stock"
-                  ? "Low Stock"
-                  : "Out of Stock"
-              }
-              style={themed([
-                $segmentText,
-                isActive && $segmentTextActive,
-              ])}
-            />
-          </TouchableOpacity>
-        )
-      })}
-    </View>
+                <TagPill
+                  key={tag.label}
+                  label={tag.label}
+                  color={tag.color}
+                  textColor={tag.textColor}
+                  active={active}
+                  onPress={() =>
+                    setStockFilter(prev =>
+                      active ? prev.filter(t => t !== tag.label) : [...prev, tag.label]
+                    )
+                  }
+                />
+              )
+            })}
+          </View>
 
           {/* Prep Time Filter */}
-          <View style={themed($segmentRow)}>
-            {(["minimal prep", "moderate prep", "full prep"] as const).map((item) => {
-              const isActive = prepFilter.includes(item)
-
+          <View style={[themed($segmentRow), { flexWrap: "wrap" }]}>
+            {prepTimeTags.map(tag => {
+              const active = prepFilter.includes(tag.label)
+    
               return (
-                <TouchableOpacity
-                  key={item}
-                  style={themed([
-                   $segmentButton,
-                  isActive && $segmentButtonActive,
-              ])}
-              onPress={() =>
-                  setPrepFilter((prev) =>
-                    isActive
-                      ? prev.filter((v) => v !== item) // remove
-                      : [...prev, item] // add
-                  )
-                }
-            >
-              <Text
-                text={
-                  item === "minimal prep"
-                  ? "Minimal Prep"
-                  : item === "moderate prep"
-                  ? "Moderate Prep"
-                  : "Full Prep"
-                }
-                style={themed([
-                  $segmentText,
-                  isActive && $segmentTextActive,
-                ])}
-              />
-            </TouchableOpacity>
-          )
-        })}
-      </View>
-
+                <TagPill
+                  key={tag.label}
+                  label={tag.label}
+                  color={tag.color}
+                  textColor={tag.textColor}
+                  active={active}
+                  onPress={() =>
+                    setPrepFilter(prev =>
+                      active ? prev.filter(t => t !== tag.label) : [...prev, tag.label]
+                    )
+                  }
+                />
+              )
+            })}
+          </View>
 
           {/* Sensory Tags Filter */}
           <View style={[themed($segmentRow), { flexWrap: "wrap" }]}>
-            {availableTags.map((tag) => {
-              const isActive = sensoryFilter.includes(tag.label)
-
+            {availableTags.map(tag => {
+              const active = sensoryFilter.includes(tag.label)
+    
               return (
-                <TouchableOpacity
+                <TagPill
                   key={tag.label}
-                  style={[
-                    themed($segmentButton),
-                    {
-                      backgroundColor: isActive ? tag.color : theme.colors.palette.neutral200,
-                      borderColor: isActive ? tag.color : theme.colors.palette.neutral400,
-                    },
-                  ]}
+                  label={tag.label}
+                  color={tag.color}
+                  textColor={tag.textColor}
+                  active={active}
                   onPress={() =>
-                    setSensoryFilter((prev) =>
-                      isActive
-                      ? prev.filter((t) => t !== tag.label)
-                      : [...prev, tag.label]
+                    setSensoryFilter(prev =>
+                      active ? prev.filter(t => t !== tag.label) : [...prev, tag.label]
                     )
                   }
-                >
-                  <Text
-                     text={tag.label}
-                      style={[
-                        themed($segmentText),
-                        { color: isActive ? "white" : theme.colors.text },
-                      ]}
-                    />
-                 </TouchableOpacity>
-               )
+                />
+              )
             })}
-        </View>
+          </View>
+
         </View>
       )}
 
@@ -614,28 +570,6 @@ const $viewToggle: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
 const $segmentRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexDirection: "row",
   gap: spacing.xs,
-})
-
-const $segmentButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  borderColor: colors.palette.neutral400,
-  borderRadius: 10,
-  borderWidth: 1,
-  paddingHorizontal: spacing.sm,
-  paddingVertical: 4,
-})
-
-const $segmentButtonActive: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  backgroundColor: colors.tint,
-  borderColor: colors.tint,
-})
-
-const $segmentText: ThemedStyle<TextStyle> = ({ colors }) => ({
-  color: colors.text,
-  fontSize: 11,
-})
-
-const $segmentTextActive: ThemedStyle<TextStyle> = ({ colors }) => ({
-  color: colors.palette.neutral100,
 })
 
 const $sortRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
