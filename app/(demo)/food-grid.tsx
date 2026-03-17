@@ -286,34 +286,17 @@ export default function FoodGridScreen() {
 
       {/* SEARCH TAB → Searchbar only */}
       {topTab === "search" && (
-        <View style={themed($topRow)}>
+        <View style={themed($searchContainer)}>
           <Searchbar
-            placeholder="Search foods"
+            placeholder="search your safe foods"
             onChangeText={setSearchQuery}
             value={searchQuery}
             style={themed($searchBar)}
             inputStyle={themed($searchInput)}
-            iconColor={theme.colors.palette.neutral500}
-            placeholderTextColor={theme.colors.palette.neutral500}
+            iconColor={"#6A6A6A"}
+            placeholderTextColor={"#6A6A6A"}
             elevation={0}
           />
-
-          <TouchableOpacity
-            style={themed($viewToggle)}
-            onPress={() =>
-              setViewMode(viewMode === "grid" ? "list" : "grid")
-            }
-          >
-            <MaterialCommunityIcons
-              name={
-                viewMode === "grid"
-                  ? "format-list-bulleted"
-                  : "view-grid-outline"
-              }
-              size={24}
-              color={theme.colors.text}
-            />
-          </TouchableOpacity>
         </View>
       )}
 
@@ -546,17 +529,28 @@ const $topRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   gap: spacing.xs,
 })
 
+const $searchContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  width: "100%",
+  paddingHorizontal: spacing.sm,
+  marginBottom: spacing.xs,
+})
+
 const $searchBar: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  backgroundColor: colors.palette.neutral200,
+  backgroundColor: "transparent",
   borderRadius: 12,
-  flex: 1,
-  minHeight: 40,
+  borderWidth: 1,
+  borderColor: colors.palette.neutral400,
+  height: 40,
+  justifyContent: "center",
+  paddingVertical: 0,
+  width: "100%",
 })
 
 const $searchInput: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.text,
-  minHeight: 0,
   fontSize: 14,
+  paddingTop: 0,
+  paddingBottom: 17,
 })
 
 const $viewToggle: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
