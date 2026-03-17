@@ -27,7 +27,7 @@ import type { ThemedStyle } from "@/theme/types"
 
 import SafeFoodsCreateModal from "@/components/CreateNewSafeFoodModal"
 import EditSafeFoodModal from "@/components/EditSafeFoodModal"
-import { v } from "convex/values"
+import { FoodCard } from "@/components/FoodCard"
 import { availableTags, prepTimeTags, stockTags } from "@/components/FoodTagsInfo/FoodTags"
 import { TagPill } from "@/components/FoodTagsInfo/TagPill"
 
@@ -137,114 +137,6 @@ export default function FoodGridScreen() {
       setIsRefreshing(false)
     }
   }
-
-  const handleDelete = (id: Id<"foods">) => {
-    Alert.alert("Delete food", "This cannot be undone.", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await deleteFood({ id })
-          } catch {
-            Alert.alert("Delete failed", "Unable to delete this food.")
-          }
-        },
-      },
-    ])
-  }
-
-  const handleStockToggle = async (id: Id<"foods">, inStock: boolean) => {
-    try {
-      if (inStock) {
-        await markOutOfStock({ id })
-      } else {
-        await setInStock({ id, inStock: "In Stock" })
-      }
-    } catch {
-      Alert.alert("Update failed", "Unable to update stock status.")
-    }
-  }
-
-  const renderGridItem = ({
-    item,
-  }: {
-    item: Doc<"foods"> & { height: number }
-  }) => (
-    <Pressable
-      accessibilityRole="button"
-      style={themed($itemContainer)}
-      onPress={() => {
-        setEditingFood(item)}}
-    >
-      <Image
-        source={{
-          uri: item.imageUrl || "https://loremflickr.com/300/300/food",
-        }}
-        style={[themed($image), { height: item.height }]}
-        resizeMode="cover"
-      />
-      <Text style={themed($label)} numberOfLines={1}>
-        {item.name}
-      </Text>
-      <Text style={themed($metaLabel)} numberOfLines={1}>
-        {item.inStock ? "In stock" : "Out of stock"}
-      </Text>
-    </Pressable>
-  )
-
-  const renderListItem = ({ item }: { item: Doc<"foods"> }) => (
-    <Card
-      style={themed($card)}
-      onPress={() => router.push(`/safe-foods/${item._id}`)}
-      HeadingComponent={<Text preset="bold" text={item.name} />}
-      ContentComponent={
-        <View>
-          {!!item.description && (
-            <Text
-              text={item.description}
-              selectable
-              style={{ marginBottom: 4 }}
-            />
-          )}
-          <Text
-            text={`${item.isSafe ? "Safe" : "Unsafe"} · ${
-              item.inStock ? "In stock" : "Out of stock"
-            }`}
-            style={themed($metaLabel)}
-          />
-        </View>
-      }
-      FooterComponent={
-        <View style={themed($cardFooter)}>
-          <View style={themed($cardActions)}>
-            <Button
-              text="Edit"
-              preset="reversed"
-              style={{ flex: 1 }}
-              onPress={() => router.push(`/safe-foods/${item._id}/edit`)}
-            />
-            <Button
-              text={item.inStock ? "Mark Out" : "Mark In"}
-              style={{ flex: 1.5 }}
-              onPress={() => handleStockToggle(item._id, item.inStock)}
-            />
-            <TouchableOpacity
-              onPress={() => handleDelete(item._id)}
-              style={themed($deleteButton)}
-            >
-              <MaterialCommunityIcons
-                name="delete-outline"
-                size={24}
-                color={theme.colors.error}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-      }
-    />
-  )
 
   return (
   <Screen
@@ -409,7 +301,17 @@ export default function FoodGridScreen() {
         key={viewMode}
         data={foods}
         numColumns={viewMode === "grid" ? 2 : 1}
-        renderItem={viewMode === "grid" ? (renderGridItem as any) : (renderListItem as any)}
+        renderItem={({ item }) => (
+          <FoodCard
+            item={item}
+            onEdit={(food) => setEditingFood(food)}
+            themed={themed}
+            $itemContainer={$itemContainer}
+            $image={$image}
+            $label={$label}
+            $metaLabel={$metaLabel}
+          />
+        )}
         masonry={viewMode === "grid"}
         optimizeItemArrangement={viewMode === "grid"}
         estimatedItemSize={viewMode === "grid" ? 200 : 150}
