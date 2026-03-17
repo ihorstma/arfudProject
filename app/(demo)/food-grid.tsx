@@ -28,8 +28,8 @@ import type { ThemedStyle } from "@/theme/types"
 import SafeFoodsCreateModal from "@/components/CreateNewSafeFoodModal"
 import EditSafeFoodModal from "@/components/EditSafeFoodModal"
 import { v } from "convex/values"
+import { availableTags } from "@/components/FoodTags"
 
-type StockFilter = "all" | "in stock" | "low stock" | "out of stock"
 type SortMode = "updated" | "name"
 type ViewMode = "grid" | "list"
 
@@ -56,10 +56,12 @@ export default function FoodGridScreen() {
     useConvexAuth()
   const { themed, theme } = useAppTheme()
 
-  const [viewMode, setViewMode] = useState<ViewMode>("grid")
-  const [searchQuery, setSearchQuery] = useState("")
   const [stockFilter, setStockFilter] = useState<string[]>([])
   const [prepFilter, setPrepFilter] = useState<string[]>([])
+  const [sensoryFilter, setSensoryFilter] = useState<string[]>([])
+
+  const [viewMode, setViewMode] = useState<ViewMode>("grid")
+  const [searchQuery, setSearchQuery] = useState("")
   const [sortMode, setSortMode] = useState<SortMode>("updated")
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -112,12 +114,18 @@ export default function FoodGridScreen() {
         item.prepTime?.some((tag) => prepFilter.includes(tag))
     )}
 
+    // --- FILTER TAB: Sensory (multi-select)
+    if (topTab === "filter" && sensoryFilter.length > 0) {
+      list = list.filter(item =>
+        item.tags?.some((tag) => sensoryFilter.includes(tag))
+    )}
+
     // --- SORTING ---
     return list.sort((a, b) => {
       if (sortMode === "name") return a.name.localeCompare(b.name)
       return b.updatedAt - a.updatedAt
     })
-  }, [rawFoods, topTab, searchQuery, stockFilter, prepFilter, sortMode])
+  }, [rawFoods, topTab, searchQuery, stockFilter, prepFilter, sensoryFilter, sortMode])
 
 
   const onRefresh = async () => {
@@ -310,7 +318,7 @@ export default function FoodGridScreen() {
         </View>
       )}
 
-      {/* FILTER TAB → Stock filters (prep + sensory later) */}
+      {/* FILTER TAB -> stock, prep, sensory later) */}
       {topTab === "filter" && (
         <View style={{ gap: 12 }}>
 
@@ -391,7 +399,40 @@ export default function FoodGridScreen() {
       </View>
 
 
-          {/* Sensory filter goes here */}
+          {/* Sensory Tags Filter */}
+          <View style={[themed($segmentRow), { flexWrap: "wrap" }]}>
+            {availableTags.map((tag) => {
+              const isActive = sensoryFilter.includes(tag.label)
+
+              return (
+                <TouchableOpacity
+                  key={tag.label}
+                  style={[
+                    themed($segmentButton),
+                    {
+                      backgroundColor: isActive ? tag.color : theme.colors.palette.neutral200,
+                      borderColor: isActive ? tag.color : theme.colors.palette.neutral400,
+                    },
+                  ]}
+                  onPress={() =>
+                    setSensoryFilter((prev) =>
+                      isActive
+                      ? prev.filter((t) => t !== tag.label)
+                      : [...prev, tag.label]
+                    )
+                  }
+                >
+                  <Text
+                     text={tag.label}
+                      style={[
+                        themed($segmentText),
+                        { color: isActive ? "white" : theme.colors.text },
+                      ]}
+                    />
+                 </TouchableOpacity>
+               )
+            })}
+        </View>
         </View>
       )}
 
