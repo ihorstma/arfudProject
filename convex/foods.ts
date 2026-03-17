@@ -35,6 +35,7 @@ export const listFoods = query({
   args: {
     includeUnsafe: v.optional(v.boolean()),
     inStock: v.optional(v.string()),
+    search: v.optional(v.string()),
   },
   returns: v.array(foodValidator),
   handler: async (ctx, args) => {
@@ -73,7 +74,15 @@ export const listFoods = query({
         )
     }
 
-    const items = await dbQuery.collect()
+    let items = await dbQuery.collect()
+
+    if (args.search && args.search.trim() !== "") {
+      const q = args.search.toLowerCase()
+      items = items.filter(item =>
+        item.name.toLowerCase().includes(q)
+      )
+    }
+
     return items.sort((a, b) => b.updatedAt - a.updatedAt)
   },
 })

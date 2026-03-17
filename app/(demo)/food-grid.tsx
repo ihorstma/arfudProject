@@ -27,10 +27,14 @@ import type { ThemedStyle } from "@/theme/types"
 
 import SafeFoodsCreateModal from "@/components/CreateNewSafeFoodModal"
 import EditSafeFoodModal from "@/components/EditSafeFoodModal"
+import { v } from "convex/values"
+import { availableTags, prepTimeTags, stockTags } from "@/components/FoodTagsInfo/FoodTags"
+import { TagPill } from "@/components/FoodTagsInfo/TagPill"
 
-type StockFilter = "all" | "in" | "out"
 type SortMode = "updated" | "name"
 type ViewMode = "grid" | "list"
+
+type TopTab = "all" | "search" | "filter"
 
 const getRandomHeight = (id: string) => {
   let hash = 0
@@ -53,9 +57,12 @@ export default function FoodGridScreen() {
     useConvexAuth()
   const { themed, theme } = useAppTheme()
 
+  const [stockFilter, setStockFilter] = useState<string[]>([])
+  const [prepFilter, setPrepFilter] = useState<string[]>([])
+  const [sensoryFilter, setSensoryFilter] = useState<string[]>([])
+
   const [viewMode, setViewMode] = useState<ViewMode>("grid")
   const [searchQuery, setSearchQuery] = useState("")
-  const [stockFilter, setStockFilter] = useState<StockFilter>("all")
   const [sortMode, setSortMode] = useState<SortMode>("updated")
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -65,11 +72,19 @@ export default function FoodGridScreen() {
   const seedFoods = useMutation(api.foods.seedFoods)
   const setInStock = useMutation(api.foods.setInStock)
   const markOutOfStock = useMutation(api.foods.markOutOfStock)
+  const [topTab, setTopTab] = useState<TopTab>("all")
 
   const rawFoods = useQuery(
-    api.foods.listFoods,
-    isConvexAuthenticated ? { includeUnsafe: true } : "skip",
-  )
+  api.foods.listFoods,
+  isConvexAuthenticated
+    ? {
+        includeUnsafe: true,
+        inStock: undefined, // you’re filtering client-side now
+        search: topTab === "search" ? searchQuery : undefined,
+      }
+    : "skip",
+)
+
 
   const trigger = useAddFoodTrigger((s) => s.trigger)
   const setTrigger = useAddFoodTrigger((s) => s.setTrigger)
@@ -82,27 +97,36 @@ export default function FoodGridScreen() {
   }, [trigger])
 
   const foods = useMemo(() => {
-    const withHeights = (rawFoods ?? []).map((item: Doc<"foods">) => ({
+    let list = (rawFoods ?? []).map(item => ({
       ...item,
       height: getRandomHeight(item._id),
     }))
 
-    const withFilters = withHeights.filter((item) => {
-      if (stockFilter === "in" && !item.inStock) return false
-      if (stockFilter === "out" && item.inStock) return false
-      if (
-        searchQuery &&
-        !item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-        return false
-      return true
-    })
+    // --- FILTER TAB: Stock ---
+    if (topTab === "filter" && stockFilter.length > 0) {
+      list = list.filter(item => 
+        stockFilter.includes(item.inStock ?? "")
+    )}
 
-    return withFilters.sort((a, b) => {
+    // --- FILTER TAB: Prep ---
+    if (topTab === "filter" && prepFilter.length > 0) {
+      list = list.filter(item =>
+        item.prepTime?.some((tag) => prepFilter.includes(tag))
+    )}
+
+    // --- FILTER TAB: Sensory (multi-select)
+    if (topTab === "filter" && sensoryFilter.length > 0) {
+      list = list.filter(item =>
+        item.tags?.some((tag) => sensoryFilter.includes(tag))
+    )}
+
+    // --- SORTING ---
+    return list.sort((a, b) => {
       if (sortMode === "name") return a.name.localeCompare(b.name)
       return b.updatedAt - a.updatedAt
     })
-  }, [rawFoods, searchQuery, sortMode, stockFilter])
+  }, [rawFoods, topTab, searchQuery, stockFilter, prepFilter, sensoryFilter, sortMode])
+
 
   const onRefresh = async () => {
     if (!isConvexAuthenticated) return
@@ -223,24 +247,135 @@ export default function FoodGridScreen() {
   )
 
   return (
-    <Screen
-      preset="fixed"
-      safeAreaEdges={["top"]}
-      contentContainerStyle={$styles.flex1}
-      style={{ backgroundColor: theme.colors.palette.neutral100 }}
-    >
-      <View style={themed($header)}>
-        <View style={themed($topRow)}>
+  <Screen
+    preset="fixed"
+    safeAreaEdges={["top"]}
+    contentContainerStyle={$styles.flex1}
+    style={{ backgroundColor: theme.colors.palette.neutral100 }}
+  >
+
+    {/* --- TOP TABS (All / Search / Filter) --- */}
+    <View style={themed($topTabsRow)}>
+      {(["all", "search", "filter"] as const).map((tab) => {
+        const active = topTab === tab
+        
+        return (
+          <TouchableOpacity
+            key={tab}
+            onPress={() => setTopTab(tab)}
+            style={themed($topTabTouchable)}
+          >
+            <Text
+              text={
+                tab === "all"
+                  ? "all"
+                  : tab === "search"
+                  ? "search"
+                  : "filter"
+              }
+              style={themed($topTabTextNew(active))}
+            />
+            {active && <View style={themed($topTabUnderline)} />}
+          </TouchableOpacity>
+          )
+      })}
+    </View>
+
+    {/* --- HEADER CONTENT CHANGES BASED ON TAB --- */}
+    <View style={themed($header)}>
+
+      {/* SEARCH TAB → Searchbar only */}
+      {topTab === "search" && (
+        <View style={themed($searchContainer)}>
           <Searchbar
-            placeholder="Search foods"
+            placeholder="search your safe foods"
             onChangeText={setSearchQuery}
             value={searchQuery}
             style={themed($searchBar)}
             inputStyle={themed($searchInput)}
-            iconColor={theme.colors.palette.neutral500}
-            placeholderTextColor={theme.colors.palette.neutral500}
+            iconColor={"#6A6A6A"}
+            placeholderTextColor={"#6A6A6A"}
             elevation={0}
           />
+        </View>
+      )}
+
+      {/* FILTER TAB -> stock, prep, sensory later) */}
+      {topTab === "filter" && (
+        <View style={{ gap: 12 }}>
+
+          {/* Stock Filter */}
+          <View style={[themed($segmentRow), { flexWrap: "wrap" }]}>
+            {stockTags.map(tag => {
+              const active = stockFilter.includes(tag.label)
+    
+              return (
+                <TagPill
+                  key={tag.label}
+                  label={tag.label}
+                  color={tag.color}
+                  textColor={tag.textColor}
+                  active={active}
+                  onPress={() =>
+                    setStockFilter(prev =>
+                      active ? prev.filter(t => t !== tag.label) : [...prev, tag.label]
+                    )
+                  }
+                />
+              )
+            })}
+          </View>
+
+          {/* Prep Time Filter */}
+          <View style={[themed($segmentRow), { flexWrap: "wrap" }]}>
+            {prepTimeTags.map(tag => {
+              const active = prepFilter.includes(tag.label)
+    
+              return (
+                <TagPill
+                  key={tag.label}
+                  label={tag.label}
+                  color={tag.color}
+                  textColor={tag.textColor}
+                  active={active}
+                  onPress={() =>
+                    setPrepFilter(prev =>
+                      active ? prev.filter(t => t !== tag.label) : [...prev, tag.label]
+                    )
+                  }
+                />
+              )
+            })}
+          </View>
+
+          {/* Sensory Tags Filter */}
+          <View style={[themed($segmentRow), { flexWrap: "wrap" }]}>
+            {availableTags.map(tag => {
+              const active = sensoryFilter.includes(tag.label)
+    
+              return (
+                <TagPill
+                  key={tag.label}
+                  label={tag.label}
+                  color={tag.color}
+                  textColor={tag.textColor}
+                  active={active}
+                  onPress={() =>
+                    setSensoryFilter(prev =>
+                      active ? prev.filter(t => t !== tag.label) : [...prev, tag.label]
+                    )
+                  }
+                />
+              )
+            })}
+          </View>
+
+        </View>
+      )}
+
+      {/* ALL TAB → No search, no filters */}
+      {topTab === "all" && (
+        <View style={themed($topRow)}>
           <TouchableOpacity
             style={themed($viewToggle)}
             onPress={() =>
@@ -258,116 +393,101 @@ export default function FoodGridScreen() {
             />
           </TouchableOpacity>
         </View>
+      )}
 
-        <View style={themed($segmentRow)}>
-          {(["all", "in", "out"] as const).map((item) => (
-            <TouchableOpacity
-              key={item}
-              style={themed([
-                $segmentButton,
-                stockFilter === item && $segmentButtonActive,
-              ])}
-              onPress={() => setStockFilter(item)}
-            >
-              <Text
-                text={
-                  item === "all" ? "All" : item === "in" ? "In Stock" : "Out"
-                }
-                style={themed([
-                  $segmentText,
-                  stockFilter === item && $segmentTextActive,
-                ])}
-              />
-            </TouchableOpacity>
-          ))}
-        </View>
+    </View>
 
-        <View style={themed($sortRow)}>
-          <TouchableOpacity
-            onPress={() =>
-              setSortMode((current) =>
-                current === "updated" ? "name" : "updated",
-              )
-            }
-            style={themed($sortButton)}
-          >
-            <Text
-              text={`Sort: ${getLabel(sortMode)}`}
-              style={themed($sortButtonText)}
-            />
-          </TouchableOpacity>
-          <Button
-            text="Clear"
-            preset="reversed"
-            style={{ minHeight: 0, paddingVertical: 4 }}
-            onPress={() => {
-              setSearchQuery("")
-              setStockFilter("all")
-              setSortMode("updated")
-            }}
-          />
-        </View>
+    {/* --- LIST CONTENT --- */}
+    {isConvexAuthLoading || rawFoods === undefined ? (
+      <View style={themed($skeletonGrid)}>
+        {Array.from({ length: 6 }).map((_, index) => (
+          <View key={index} style={themed($skeletonCard)} />
+        ))}
       </View>
-
-      {isConvexAuthLoading || rawFoods === undefined ? (
-        <View style={themed($skeletonGrid)}>
-          {Array.from({ length: 6 }).map((_, index) => (
-            <View key={index} style={themed($skeletonCard)} />
-          ))}
-        </View>
-      ) : (
-        <FlashList
-          key={viewMode}
-          data={foods}
-          numColumns={viewMode === "grid" ? 2 : 1}
-          renderItem={viewMode === "grid" ? (renderGridItem as any) : (renderListItem as any)}
-          // @ts-ignore
-          masonry={viewMode === "grid"}
-          optimizeItemArrangement={viewMode === "grid"}
-          estimatedItemSize={viewMode === "grid" ? 200 : 150}
-          contentContainerStyle={themed($listContent)}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
-          }
-          ListEmptyComponent={
-            <View style={themed($emptyState)}>
-              <Text preset="subheading" text="No foods found" />
-              <Button
-                text="Add Food"
-                preset="reversed"
-                onPress={() => setShowCreateModal(true)}
-              />
-              <Button
-                text="Seed Test Data"
-                onPress={async () => {
-                  setIsRefreshing(true)
-                  try {
-                    await seedFoods()
-                  } finally {
-                    setIsRefreshing(false)
-                  }
-                }}
-              />
-            </View>
-          }
-        />
-      )}
-      <SafeFoodsCreateModal
-        visible={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+    ) : (
+      <FlashList
+        key={viewMode}
+        data={foods}
+        numColumns={viewMode === "grid" ? 2 : 1}
+        renderItem={viewMode === "grid" ? (renderGridItem as any) : (renderListItem as any)}
+        masonry={viewMode === "grid"}
+        optimizeItemArrangement={viewMode === "grid"}
+        estimatedItemSize={viewMode === "grid" ? 200 : 150}
+        contentContainerStyle={themed($listContent)}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+        }
+        ListEmptyComponent={
+          <View style={themed($emptyState)}>
+            <Text preset="subheading" text="No foods found" />
+            <Button
+              text="Add Food"
+              preset="reversed"
+              onPress={() => setShowCreateModal(true)}
+            />
+            <Button
+              text="Seed Test Data"
+              onPress={async () => {
+                setIsRefreshing(true)
+                try {
+                  await seedFoods()
+                } finally {
+                  setIsRefreshing(false)
+                }
+              }}
+            />
+          </View>
+        }
       />
+    )}
 
-      {editingFood && (
-        <EditSafeFoodModal
-          visible={!!editingFood}
-          food={editingFood}
-          onClose={() => setEditingFood(null)}
-        />
-      )}
-    </Screen>
-  )
+    {/* --- MODALS --- */}
+    <SafeFoodsCreateModal
+      visible={showCreateModal}
+      onClose={() => setShowCreateModal(false)}
+    />
+
+    {editingFood && (
+      <EditSafeFoodModal
+        visible={!!editingFood}
+        food={editingFood}
+        onClose={() => setEditingFood(null)}
+      />
+    )}
+
+  </Screen>
+)
+
 }
+
+const $topTabsRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  gap: spacing.sm,
+  paddingHorizontal: spacing.md,
+  paddingTop: spacing.sm,
+})
+
+const $topTabTouchable: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  paddingVertical: spacing.xs,
+  alignItems: "center",
+})
+
+const $topTabTextNew = (active: boolean): ThemedStyle<TextStyle> =>
+  ({ colors, typography }) => ({
+    fontFamily: typography.primary.medium,
+    fontSize: 16,
+    color: colors.text, // black
+    opacity: active ? 1 : 0.5,
+  })
+
+const $topTabUnderline: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  height: 2,
+  width: "100%",
+  backgroundColor: colors.text, // black underline
+  marginTop: 2,
+  borderRadius: 1,
+})
 
 const $listContent: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   paddingHorizontal: spacing.sm,
@@ -409,17 +529,28 @@ const $topRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   gap: spacing.xs,
 })
 
+const $searchContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  width: "100%",
+  paddingHorizontal: spacing.sm,
+  marginBottom: spacing.xs,
+})
+
 const $searchBar: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  backgroundColor: colors.palette.neutral200,
+  backgroundColor: "transparent",
   borderRadius: 12,
-  flex: 1,
-  minHeight: 40,
+  borderWidth: 1,
+  borderColor: colors.palette.neutral400,
+  height: 40,
+  justifyContent: "center",
+  paddingVertical: 0,
+  width: "100%",
 })
 
 const $searchInput: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.text,
-  minHeight: 0,
   fontSize: 14,
+  paddingTop: 0,
+  paddingBottom: 17,
 })
 
 const $viewToggle: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
@@ -431,28 +562,6 @@ const $viewToggle: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
 const $segmentRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexDirection: "row",
   gap: spacing.xs,
-})
-
-const $segmentButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  borderColor: colors.palette.neutral400,
-  borderRadius: 10,
-  borderWidth: 1,
-  paddingHorizontal: spacing.sm,
-  paddingVertical: 4,
-})
-
-const $segmentButtonActive: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  backgroundColor: colors.tint,
-  borderColor: colors.tint,
-})
-
-const $segmentText: ThemedStyle<TextStyle> = ({ colors }) => ({
-  color: colors.text,
-  fontSize: 11,
-})
-
-const $segmentTextActive: ThemedStyle<TextStyle> = ({ colors }) => ({
-  color: colors.palette.neutral100,
 })
 
 const $sortRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({

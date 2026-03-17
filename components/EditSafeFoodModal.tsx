@@ -20,7 +20,7 @@ import { Image } from "react-native"
 import { Doc } from "@/convex/_generated/dataModel"
 
 import DeletePopupModal from "./DeletePopupModal"
-import { availableTags, prepTimeTags, stockTags } from "./FoodTags"
+import { availableTags, prepTimeTags, stockTags } from "./FoodTagsInfo/FoodTags"
 
 interface EditFoodModalProps {
   visible: boolean

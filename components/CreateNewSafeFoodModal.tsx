@@ -18,7 +18,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons"
 import * as ImagePicker from "expo-image-picker"
 import { Image } from "react-native"
 
-import { availableTags, prepTimeTags, stockTags } from "./FoodTags"
+import { availableTags, prepTimeTags, stockTags } from "./FoodTagsInfo/FoodTags"
 
 
 interface addFoodModalProps {
