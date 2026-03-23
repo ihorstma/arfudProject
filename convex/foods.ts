@@ -22,6 +22,19 @@ const foodValidator = v.object({
   stockStatus: v.optional(v.array(v.string())),
   createdAt: v.number(),
   updatedAt: v.number(),
+  recipes: v.optional(
+    v.array(
+      v.object({
+        ingredients: v.array(
+          v.object({
+            name: v.string(),
+            quantity: v.string(),
+          })
+        ),
+        instructions: v.string(),
+      })
+    )
+  ),
 })
 
 const requireOwnerId = async (ctx: any) => {
@@ -120,6 +133,19 @@ const addFoodArgs = {
   prepTime: v.optional(v.array(v.string())),
   stockStatus: v.optional(v.array(v.string())),
   description: v.optional(v.string()),
+  recipes: v.optional(
+    v.array(
+      v.object({
+        ingredients: v.array(
+          v.object({
+            name: v.string(),
+            quantity: v.string(),
+          })
+        ),
+        instructions: v.string(),
+      })
+    )
+  ),
 }
 
 export const addFood = mutation({
@@ -207,43 +233,3 @@ export const markOutOfStock = mutation({
     return null
   },
 })
-
-
-
-export const seedFoods = mutation({
-  args: {},
-  returns: v.null(),
-  handler: async (ctx) => {
-    const ownerId = await requireOwnerId(ctx)
-    const DISHES = [
-      "Pizza", "Pasta", "Burger", "Salad", "Sushi", "Tacos",
-      "Soup", "Sandwich", "Ice Cream", "Cake", "Apple",
-      "Banana", "Chicken", "Rice", "Steak", "Fries",
-      "Eggs", "Toast", "Cereal", "Yogurt",
-    ]
-
-    const SENSORY = ["sweet", "savory", "crunchy", "soft", "chewy", "creamy"]
-    const PREP = ["minimal prep", "moderate prep", "full prep"]
-    const STOCK = ["in stock", "low stock", "out of stock"]
-
-    for (let i = 0; i < 20; i++) {
-      const name = DISHES[i % DISHES.length]
-      await ctx.db.insert("foods", {
-        ownerId,
-        name,
-        description: `Delicious ${name}`,
-        isSafe: Math.random() > 0.3,
-        inStock: STOCK[Math.floor(Math.random() * STOCK.length)],
-        imageUrl: `https://loremflickr.com/300/300/food?lock=${i}`,
-        // optional:
-        // tags: [...],
-        // prepTime: [...],
-        // stockStatus: [...],
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      })
-    }
-    return null
-  },
-})
-

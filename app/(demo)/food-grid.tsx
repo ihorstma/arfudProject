@@ -69,7 +69,6 @@ export default function FoodGridScreen() {
   const [editingFood, setEditingFood] = useState<Doc<"foods"> | null>(null)
 
   const deleteFood = useMutation(api.foods.deleteFood)
-  const seedFoods = useMutation(api.foods.seedFoods)
   const setInStock = useMutation(api.foods.setInStock)
   const markOutOfStock = useMutation(api.foods.markOutOfStock)
   const [topTab, setTopTab] = useState<TopTab>("all")
@@ -327,17 +326,6 @@ export default function FoodGridScreen() {
               text="Add Food"
               preset="reversed"
               onPress={() => setShowCreateModal(true)}
-            />
-            <Button
-              text="Seed Test Data"
-              onPress={async () => {
-                setIsRefreshing(true)
-                try {
-                  await seedFoods()
-                } finally {
-                  setIsRefreshing(false)
-                }
-              }}
             />
           </View>
         }

@@ -45,7 +45,6 @@ export default function SafeFoodManagerScreen() {
   const deleteFood = useMutation(api.foods.deleteFood)
   const setInStock = useMutation(api.foods.setInStock)
   const markOutOfStock = useMutation(api.foods.markOutOfStock)
-  const seedFoods = useMutation(api.foods.seedFoods)
 
   const allFoods = useQuery(api.foods.listAllFoods, isConvexAuthenticated ? {} : "skip")
 
@@ -271,17 +270,6 @@ export default function SafeFoodManagerScreen() {
               text="Add Food"
               preset="reversed"
               onPress={() => router.push("/safe-foods/create")}
-            />
-            <Button
-              text="Seed Test Data"
-              onPress={async () => {
-                setIsRefreshing(true)
-                try {
-                  await seedFoods()
-                } finally {
-                  setIsRefreshing(false)
-                }
-              }}
             />
           </View>
         }
