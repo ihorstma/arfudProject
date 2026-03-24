@@ -84,7 +84,12 @@ export function RecipeModal({ visible, onClose, onSave }:  Props) {
                 {/* SAVE BUTTON */}
                 <Button
                     text="save recipe"
-                    onPress={() => onSave({ ingredients, instructions })}
+                    onPress={() => {
+                        const cleanedIngredients = ingredients.filter(
+                            ing => ing.name.trim() !== "" || ing.quantity.trim() !== ""
+                        )
+                        onSave({ ingredients: cleanedIngredients, instructions })
+                    }}
                     style={{ backgroundColor: "#FF9400", minHeight: 40, marginTop: 12 }}
                     textStyle={{ color: "white" }}
                 />
