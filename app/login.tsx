@@ -15,6 +15,9 @@ import { authClient } from "@/services/auth-client"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 
+import ARFUDtxt from "../.../assets/icons/arfudIconsLightMode/ARFUDtxt.png"
+import logintxt from "../.../assets/icons/arfudIconsLightMode/logintxt.png"
+
 export default function LoginScreen() {
   const authPasswordInput = useRef<TextInput>(null)
   const router = useRouter()
@@ -94,9 +97,12 @@ export default function LoginScreen() {
       preset="auto"
       contentContainerStyle={themed($screenContentContainer)}
       safeAreaEdges={["top", "bottom"]}
+      style={{ backgroundColor: "#44A9D9" }}
     >
       <View style={themed($logoContainer)}>
         <Image source={require("@assets/icons/logo.png")} style={themed($logo)} />
+        <Image source={require("@assets/icons/arfudIconsLightMode/ARFUDtxt.png")} style={{ width: 190, height: 60, marginTop: 8 }} />
+        <Image source={require("@assets/icons/arfudIconsLightMode/logintxt.png")} style={{ width: 60, height: 20, marginTop: 8, marginBottom: 30 }} />
       </View>
 
       {attemptsCount > 2 && (
@@ -104,9 +110,9 @@ export default function LoginScreen() {
       )}
 
       <TextField
+        placeholder="email"
         value={authEmail}
         onChangeText={setAuthEmail}
-        label="Email"
         autoCapitalize="none"
         autoComplete="email"
         autoCorrect={false}
@@ -122,10 +128,10 @@ export default function LoginScreen() {
       />
 
       <TextField
+        placeholder="password"
         ref={authPasswordInput}
         value={authPassword}
         onChangeText={setAuthPassword}
-        label="Password"
         autoCapitalize="none"
         autoComplete="password"
         autoCorrect={false}
@@ -141,9 +147,9 @@ export default function LoginScreen() {
 
       <Button
         testID="login-button"
-        text="Sign-in"
+        text="sign in"
         style={themed($authKitButton)}
-        textStyle={themed($authKitButtonText)}
+        textStyle={themed($authKitSignInButtonText)}
         pressedStyle={themed($authKitButtonPressed)}
         onPress={login}
         disabled={isLoading}
@@ -158,13 +164,13 @@ export default function LoginScreen() {
 
       {/* Social Logins */}
       <Button
-        text="Continue with Google"
+        text="continue with google"
         style={themed($authKitSocialButton)}
         textStyle={themed($authKitButtonText)}
         pressedStyle={themed($authKitButtonPressed)}
         LeftAccessory={(props) => (
           <View style={[props.style, themed($iconSpacing)]}>
-            <Ionicons name="logo-google" size={20} color={colors.palette.neutral100} />
+            <Ionicons name="logo-google" size={20} color="black" />
           </View>
         )}
         onPress={() =>
@@ -176,13 +182,13 @@ export default function LoginScreen() {
       />
 
       <Button
-        text="Continue with Apple"
+        text="continue with apple"
         style={themed($authKitSocialButton)}
         textStyle={themed($authKitButtonText)}
         pressedStyle={themed($authKitButtonPressed)}
         LeftAccessory={(props) => (
           <View style={[props.style, themed($iconSpacing)]}>
-            <Ionicons name="logo-apple" size={20} color={colors.palette.neutral100} />
+            <Ionicons name="logo-apple" size={20} color="black" />
           </View>
         )}
         onPress={() =>
@@ -194,7 +200,7 @@ export default function LoginScreen() {
       />
 
       <Button
-        text="Don't have an account? Sign up"
+        text="don't have an account? sign up"
         style={themed($linkButton)}
         textStyle={themed($linkButtonText)}
         onPress={() => router.push("/register")}
@@ -231,8 +237,8 @@ const $textFieldContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 
 const $authKitInputWrapper: ThemedStyle<ViewStyle> = ({ colors }) => ({
   borderWidth: 2,
-  borderColor: colors.palette.neutral900,
-  borderRadius: 4,
+  borderColor: "#E0E0E0",
+  borderRadius: 8,
   backgroundColor: colors.palette.neutral100,
   height: 48,
   alignItems: "center",
@@ -257,8 +263,8 @@ const $authKitLabel: ThemedStyle<TextStyle> = ({ spacing }) => ({
 })
 
 const $authKitButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  backgroundColor: colors.palette.neutral900,
-  borderRadius: 4,
+  backgroundColor: "#E090B9",
+  borderRadius: 8,
   height: 48,
   borderWidth: 0,
   marginTop: 8,
@@ -266,8 +272,8 @@ const $authKitButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
 })
 
 const $authKitSocialButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  backgroundColor: colors.palette.neutral900,
-  borderRadius: 4,
+  backgroundColor: "white",
+  borderRadius: 8,
   height: 48,
   borderWidth: 0,
   marginTop: 8,
@@ -275,7 +281,13 @@ const $authKitSocialButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
 })
 
 const $authKitButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
-  color: colors.palette.neutral100,
+  color: "black",
+  fontSize: 20,
+  fontFamily: typography.primary.normal,
+})
+
+const $authKitSignInButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  color: "white",
   fontSize: 20,
   fontFamily: typography.primary.normal,
 })
@@ -296,7 +308,7 @@ const $linkButton: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 })
 
 const $linkButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
-  color: colors.text,
+  color: "white",
   textDecorationLine: "underline",
   fontSize: 16,
 })
@@ -310,10 +322,10 @@ const $dividerContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 const $dividerLine: ThemedStyle<ViewStyle> = ({ colors }) => ({
   flex: 1,
   height: 1,
-  backgroundColor: colors.palette.neutral300,
+  backgroundColor: "#E6E6E6",
 })
 
 const $dividerText: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   marginHorizontal: spacing.sm,
-  color: colors.textDim,
+  color: "#E6E6E6",
 })
