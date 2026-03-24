@@ -18,10 +18,12 @@ export function RecipeModal({ visible, onClose, onSave }:  Props) {
     const [ingredients, setIngredients] = useState([
         { name: "", quantity: "" }
     ])
+
     const [instructions, setInstructions] = useState("")
     const addIngredientRow = () => {
         setIngredients(prev => [...prev, { name: "", quantity: "" }])
     }
+
     const updateIngredient = (index: number, field: "name" | "quantity", value: string) => {
         setIngredients(prev => {
             const copy = [...prev]
@@ -30,13 +32,17 @@ export function RecipeModal({ visible, onClose, onSave }:  Props) {
         })
     }
 
+    const deleteIngredient = (index: number) => {
+        setIngredients(prev => prev.filter((_, i) => i !== index))
+    }
+
     return (
         <Modal visible={visible} transparent animationType="fade">
             <View style={themed($backdrop)}>
                 <View style={themed($modal)}>
           
-                {/* HEADER */}
-                <View style={{ alignItems: "center", marginBottom: 12 }}>
+                {/* header */}
+                <View style={{ alignItems: "center", marginBottom: 12, marginTop: 20 }}>
                     <Text text="add recipe" style={themed($headerTitle)} />
                     <Pressable onPress={onClose} style={{ position: "absolute", right: 0, top: 0 }}>
                         <MaterialCommunityIcons name="close" size={24} color="white" />
@@ -45,33 +51,47 @@ export function RecipeModal({ visible, onClose, onSave }:  Props) {
 
                 <ScrollView style={{ maxHeight: "80%" }} showsVerticalScrollIndicator={false}>
             
-                    {/* INGREDIENTS */}
-                    <Text text="ingredients" preset="subheading" style={{ color: "white" }} />
+                    {/* ingredients */}
+                    <Text text="ingredients" preset="subheading" style={{ color: "white", flex: 1 }} />
 
                     {ingredients.map((ing, index) => (
-                      <View key={index} style={{ flexDirection: "row", gap: 8, marginBottom: 8 }}>
+                      <View key={index} style={{ flexDirection: "row", gap: 8, marginBottom: 8, alignItems: "center" }}>
+                        {/* ingredient name */}
                         <TextField
                             value={ing.name}
                             onChangeText={(t) => updateIngredient(index, "name", t)}
                             placeholder="ingredient"
                             containerStyle={{ flex: 1 }}
                         />
+                        {/* ingredient quantity */}
                         <TextField
                             value={ing.quantity}
                             onChangeText={(t) => updateIngredient(index, "quantity", t)}
                             placeholder="qty"
                             containerStyle={{ width: 80 }}
                         />
+                        {/* delete ingredient */}
+                        <Pressable
+                            onPress={() => deleteIngredient(index)}
+                            style={{
+                                padding: 4,
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }}
+                        >
+                            <MaterialCommunityIcons name="trash-can-outline" size={22} color="white" />
+                        </Pressable>
+
                       </View>
                     ))}
 
-                    {/* ADD INGREDIENT BUTTON */}
+                    {/* add ingredient button */}
                     <Pressable onPress={addIngredientRow} style={themed($addRow)}>
                         <Text text="+ add ingredient" style={{ color: "white" }} />
                     </Pressable>
 
-                    {/* INSTRUCTIONS */}
-                    <Text text="instructions" preset="subheading" style={{ color: "white", marginTop: 16 }} />
+                    {/* instructions (text entry box) */}
+                    <Text text="instructions" preset="subheading" style={{ color: "white", marginTop: "auto" }} />
                     <TextField
                         value={instructions}
                         onChangeText={setInstructions}
@@ -81,7 +101,7 @@ export function RecipeModal({ visible, onClose, onSave }:  Props) {
 
                 </ScrollView>
 
-                {/* SAVE BUTTON */}
+                {/* save button */}
                 <Button
                     text="save recipe"
                     onPress={() => {
@@ -90,7 +110,7 @@ export function RecipeModal({ visible, onClose, onSave }:  Props) {
                         )
                         onSave({ ingredients: cleanedIngredients, instructions })
                     }}
-                    style={{ backgroundColor: "#FF9400", minHeight: 40, marginTop: 12 }}
+                    style={{ backgroundColor: "#FF9400", minHeight: 40, marginTop: 12, marginBottom: 20 }}
                     textStyle={{ color: "white" }}
                 />
 
@@ -108,10 +128,11 @@ const $backdrop = () => ({
 })
 
 const $modal = ({ spacing, colors }) => ({
-  width: "85%",
+  width: "90%",
   backgroundColor: colors.createNewFoodModalBackground,
   padding: spacing.lg,
   borderRadius: 16,
+  height: "85%",
 })
 
 const $headerTitle = ({ typography }) => ({
@@ -123,8 +144,7 @@ const $headerTitle = ({ typography }) => ({
 const $addRow = () => ({
   paddingVertical: 10,
   paddingHorizontal: 12,
-  backgroundColor: "#444",
-  borderRadius: 8,
+  backgroundColor: "#001CD3",
   alignItems: "center",
   marginBottom: 12,
 })
