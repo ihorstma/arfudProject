@@ -19,6 +19,7 @@ import * as ImagePicker from "expo-image-picker"
 import { Image } from "react-native"
 
 import { availableTags, prepTimeTags, stockTags } from "./FoodTagsInfo/FoodTags"
+import { RecipeModal } from "./RecipeModal"
 
 
 interface addFoodModalProps {
@@ -44,6 +45,8 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
   const [selectedPrepTags, setSelectedPrepTags] = useState<string[]>([])
   const [selectedStockTags, setSelectedStockTags] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
+  const [showRecipeModal, setShowRecipeModal] = useState(false)
+  const [recipes, setRecipes] = useState([])
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
@@ -86,6 +89,7 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
         imageUrl: imageUrl.trim() || undefined,
         tags: selectedTags,
         prepTime: selectedPrepTags,
+        recipes: recipes,
       })
       resetForm()
       onClose()
@@ -195,20 +199,41 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
               )
             })}
           </View>
-            <View style={{ alignItems: "flex-start", width: "100%", marginTop: 16 }}>
-              <Button
-                text="upload image"
-                style={{
-                  borderColor: "#C7D300",
-                  borderWidth: 2,
-                  backgroundColor: "#C7D300",
-                  width: 160,
-                  minHeight: 32,
-                  paddingVertical: 6,
-                }}
-                textStyle={{ color: "white" }}
-                onPress={pickImage}
-              />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                width: "100%",
+                marginTop: 16,
+              }}
+              >
+                <Button
+                  text="upload image"
+                  style={{
+                    borderColor: "#C7D300",
+                    borderWidth: 2,
+                    backgroundColor: "#C7D300",
+                    width: "48%",
+                    minHeight: 32,
+                    paddingVertical: 6,
+                  }}
+                  textStyle={{ color: "white" }}
+                  onPress={pickImage}
+                />
+
+                <Button
+                  text="add your recipe"
+                  style={{
+                    borderColor: "#001CD3",
+                    borderWidth: 2,
+                    backgroundColor: "#001CD3",
+                    width: "48%",
+                    minHeight: 32,
+                    paddingVertical: 6,
+                  }}
+                  textStyle={{ color: "white" }}
+                  onPress={() => setShowRecipeModal(true)}
+                />
           </View>
           {/* add new safe food button */}
           <View style={{ width: "100%", marginTop: 10 }}>
@@ -222,8 +247,19 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
             />
           </View>
           </View>
+          {showRecipeModal && (
+            <RecipeModal 
+              visible={showRecipeModal}
+              onClose={() => setShowRecipeModal(false)}
+              onSave={(recipe) => {
+                setRecipes(prev => [...prev, recipe])
+                setShowRecipeModal(false)
+              }}
+            />
+          )}
         </View>
     </Modal>
+
   )
 }
 

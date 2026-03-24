@@ -9,6 +9,7 @@ import { EpisodeProvider } from "@/context/EpisodeContext"
 import { translate } from "@/i18n/translate"
 import { useAppTheme } from "@/theme/context"
 import { ThemedStyle } from "@/theme/types"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 import { Image } from "react-native" 
 import arfudHome from "@/assets/icons/arfudIconsLightMode/arfudHome.png"
@@ -29,6 +30,7 @@ export default function DemoLayout() {
   } = useAppTheme()
 
   return (
+  <GestureHandlerRootView style={{ flex: 1 }}>
     <EpisodeProvider>
       <Tabs
         screenOptions={{
@@ -67,29 +69,28 @@ export default function DemoLayout() {
         />
         <Tabs.Screen
           name="food-grid"
-  options={{
-    tabBarLabel: "safe foods",
-    tabBarIcon: ({ focused }) => (
-      <Image
-        source={focused ? arfudPlus : arfudDinnerBell}
-        style={{ width: 30, height: 30 }}
-      />
-    ),
-  }}
-  listeners={({ navigation, route }) => ({
-    tabPress: (e) => {
-      const state = navigation.getState()
-      const isFocused =
-        state.index === state.routes.findIndex(({ key }: { key: string }) => key === route.key)
+          options={{
+            tabBarLabel: "safe foods",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={focused ? arfudPlus : arfudDinnerBell}
+                style={{ width: 30, height: 30 }}
+              />
+           ),
+          }}
+          listeners={({ navigation, route }) => ({
+          tabPress: (e) => {
+            const state = navigation.getState()
+            const isFocused =
+            state.index === state.routes.findIndex(({ key }: { key: string }) => key === route.key)
 
-
-      if (isFocused) {
-        e.preventDefault()
-        // this is where we trigger the modal
-        useAddFoodTrigger.getState().setTrigger(true)
-      }
-    },
-  })}
+            if (isFocused) {
+              e.preventDefault()
+              // this is where we trigger the modal
+              useAddFoodTrigger.getState().setTrigger(true)
+            }
+          },
+          })}
     
         />
         <Tabs.Screen
@@ -139,6 +140,7 @@ export default function DemoLayout() {
         <Tabs.Screen name="DemoUseCase" options={{ href: null }} />
       </Tabs>
     </EpisodeProvider>
+  </GestureHandlerRootView>
   )
 }
 

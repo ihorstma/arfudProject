@@ -14,6 +14,19 @@ export default defineSchema({
     stockStatus: v.optional(v.array(v.string())), // stock tags
     createdAt: v.number(),
     updatedAt: v.number(),
+    recipes: v.optional(
+      v.array(
+        v.object({
+          ingredients: v.array(
+            v.object({
+              name: v.string(),
+              quantity: v.string(),
+            })
+          ),
+          instructions: v.string(),
+        })
+      )
+    )
   })
     .index("by_ownerId", ["ownerId"])
     .index("by_ownerId_and_isSafe", ["ownerId", "isSafe"])

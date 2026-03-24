@@ -21,6 +21,7 @@ import { Doc } from "@/convex/_generated/dataModel"
 
 import DeletePopupModal from "./DeletePopupModal"
 import { availableTags, prepTimeTags, stockTags } from "./FoodTagsInfo/FoodTags"
+import { RecipeModal } from "./RecipeModal"
 
 interface EditFoodModalProps {
   visible: boolean
@@ -43,6 +44,12 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
   )
   const [isSaving, setIsSaving] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  const [showRecipeModal, setShowRecipeModal] = useState(false)
+  const [recipe, setRecipe] = useState(food.recipes?.[0] ?? {
+    ingredients: [{ name: "", quantity: ""}],
+    instructions: ""
+  })
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
@@ -98,6 +105,7 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
         tags: selectedTags,
         prepTime: selectedPrepTags,
         inStock: selectedStockTags[0] ?? null,
+        recipes: [recipe],
       })
       resetForm()
       onClose()
@@ -207,7 +215,14 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
               )
             })}
           </View>
-            <View style={{ alignItems: "flex-start", width: "100%", marginTop: 16 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                width: "100%",
+                marginTop: 16,
+              }}
+              >
               <Button
                 text="upload image"
                 style={{
@@ -221,6 +236,20 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
                 textStyle={{ color: "white" }}
                 onPress={pickImage}
               />
+
+              <Button
+                  text="edit recipe"
+                  style={{
+                    borderColor: "#001CD3",
+                    borderWidth: 2,
+                    backgroundColor: "#001CD3",
+                    width: "48%",
+                    minHeight: 32,
+                    paddingVertical: 6,
+                  }}
+                  textStyle={{ color: "white" }}
+                  onPress={() => setShowRecipeModal(true)}
+                />
           </View>
           {/* save safe food button */}
           <View style={{ width: "100%", marginTop: 10 }}>
@@ -280,6 +309,17 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
         />
       )}
 
+      {showRecipeModal && (
+        <RecipeModal 
+          visible={showRecipeModal}
+          initialRecipe={recipe}
+          onClose={() => setShowRecipeModal(false)}
+          onSave={(updatedRecipe) => {
+            setRecipe(updatedRecipe)
+            setShowRecipeModal(false)
+          }}
+        />
+      )}
     </View>
     </Modal>
     

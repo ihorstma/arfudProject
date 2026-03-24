@@ -23,6 +23,7 @@ type FoodCardProps = {
   $image: any
   $label: any
   $metaLabel: any
+  onViewRecipe: (food: Doc<"foods">) => void
 }
 
 
@@ -34,6 +35,7 @@ export function FoodCard({
   $image,
   $label,
   $metaLabel,
+  onViewRecipe,
 }: FoodCardProps) {
   const [isFlipped, setIsFlipped] = useState(false)
 
@@ -44,7 +46,7 @@ export function FoodCard({
       style={themed($itemContainer)}
     >
       {isFlipped ? (
-        <BackOfCard item={item} onEdit={onEdit} />
+        <BackOfCard item={item} onEdit={onEdit} onViewRecipe={onViewRecipe} />
       ) : (
         <FrontOfCard
           item={item}
@@ -74,14 +76,6 @@ function FrontOfCard({ item, themed, $image, $label, $metaLabel }: FrontProps) {
         style={[themed($image), { height: item.height }]}
         resizeMode="cover"
       />
-
-      <Text style={themed($label)} numberOfLines={1}>
-        {item.name}
-      </Text>
-
-      <Text style={themed($metaLabel)} numberOfLines={1}>
-        {item.inStock ? "In stock" : "Out of stock"}
-      </Text>
     </>
   )
 }
@@ -89,15 +83,25 @@ function FrontOfCard({ item, themed, $image, $label, $metaLabel }: FrontProps) {
 type BackProps = {
   item: Doc<"foods"> & { height: number }
   onEdit: (food: Doc<"foods">) => void
+  onViewRecipe: (food: Doc<"foods">) => void
 }
 
-function BackOfCard({ item, onEdit }: BackProps) {
+function BackOfCard({ item, onEdit, onViewRecipe }: BackProps) {
+
+  let maxVisibleTags = 3
+  if (item.height > 250) maxVisibleTags = 4
+  if (item.height > 260) maxVisibleTags = 5
+  if (item.height > 370) maxVisibleTags = 6
+
   // Combine all tag groups into one array
   const allTags = [
     ...(item.tags ?? []),
     ...(item.prepTime ?? []),
     ...(item.inStock ? [item.inStock] : []) 
   ]
+
+  const visibleTags = allTags.slice(0, maxVisibleTags)
+  const overflowTagCount = allTags.length - visibleTags.length
 
   return (
     <View
@@ -123,7 +127,7 @@ function BackOfCard({ item, onEdit }: BackProps) {
         />
 
         <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 6 }}>
-          {allTags.map(tag => {
+          {visibleTags.map(tag => {
             const info = getTagInfo(tag)
 
             return (
@@ -148,10 +152,47 @@ function BackOfCard({ item, onEdit }: BackProps) {
               </View>
             )
           })}
+
+          {overflowTagCount > 0 && (
+            <View
+              style={{
+                  backgroundColor: "#eeeeee00",
+                  paddingHorizontal: 8,
+                  paddingVertical: 4,
+                  borderRadius: 8,
+                  marginRight: 6,
+                  marginBottom: 4,
+                }}
+            >
+              <Text 
+                text={"+" + overflowTagCount + " more"}
+                style = {{ fontWeight: "600" }}
+              />
+            </View>
+          )}
         </View>
       </View>
 
-      {/* Bottom button */}
+      {/* Bottom buttons */}
+      <Button
+        text="view recipe"
+        onPress={() => onViewRecipe(item)}
+        style={{
+          minHeight: 26, 
+          paddingVertical: 0,
+          borderWidth: 2,
+          borderColor: "#001CD3",
+          backgroundColor: "#001CD3",
+          borderRadius: 8,
+          justifyContent: "center",
+        }}
+        textStyle={{
+          color: "white",
+          fontSize: 14,
+
+        }}
+      />
+
       <Button
         text="edit safe food"
         onPress={() => onEdit(item)}
