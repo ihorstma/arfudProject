@@ -19,13 +19,13 @@ interface Props {
 
 export function RecipeModal({ visible, onClose, onSave, initialRecipe }:  Props) {
     const { themed } = useAppTheme()
-    const [ingredients, setIngredients] = useState(
-        initialRecipe?.ingredients ?? { name: "", quantity: "" }
-    )
+    const safeInitial = initialRecipe && Array.isArray(initialRecipe.ingredients) ? initialRecipe : {
+        ingredients: [{ name: "", quantity: "" }],
+        instructions: "",
+    }
+    const [ingredients, setIngredients] = useState(safeInitial.ingredients)
 
-    const [instructions, setInstructions] = useState(
-        initialRecipe?.instructions ?? ""
-    )
+    const [instructions, setInstructions] = useState(safeInitial.instructions)
     const addIngredientRow = () => {
         setIngredients(prev => [...prev, { name: "", quantity: "" }])
     }

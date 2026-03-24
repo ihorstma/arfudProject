@@ -27,6 +27,7 @@ import type { ThemedStyle } from "@/theme/types"
 
 import SafeFoodsCreateModal from "@/components/CreateNewSafeFoodModal"
 import EditSafeFoodModal from "@/components/EditSafeFoodModal"
+import { RecipeModal } from "@/components/RecipeModal"
 import { FoodCard } from "@/components/FoodCard"
 import { availableTags, prepTimeTags, stockTags } from "@/components/FoodTagsInfo/FoodTags"
 import { TagPill } from "@/components/FoodTagsInfo/TagPill"
@@ -67,6 +68,7 @@ export default function FoodGridScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingFood, setEditingFood] = useState<Doc<"foods"> | null>(null)
+  const [viewingRecipe, setViewingRecipe] = useState<Doc<"foods"> | null>(null)
 
   const deleteFood = useMutation(api.foods.deleteFood)
   const setInStock = useMutation(api.foods.setInStock)
@@ -309,6 +311,7 @@ export default function FoodGridScreen() {
             $image={$image}
             $label={$label}
             $metaLabel={$metaLabel}
+            onViewRecipe={(food) => setViewingRecipe(food)}
           />
         )}
         masonry={viewMode === "grid"}
@@ -345,6 +348,16 @@ export default function FoodGridScreen() {
         onClose={() => setEditingFood(null)}
       />
     )}
+
+    {viewingRecipe && (
+      <RecipeModal
+        visible={true}
+        initialRecipe={viewingRecipe.recipes?.[0]}
+        onClose={() => setViewingRecipe(null)}
+        onSave={() => {}}   // or disable save button
+      />
+    )}
+
 
   </Screen>
 )
