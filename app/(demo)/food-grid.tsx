@@ -354,7 +354,8 @@ export default function FoodGridScreen() {
         visible={true}
         initialRecipe={viewingRecipe.recipes?.[0]}
         onClose={() => setViewingRecipe(null)}
-        onSave={() => {}}   // or disable save button
+        onSave={() => {}}
+        readOnly={true}
       />
     )}
 

@@ -15,9 +15,10 @@ interface Props {
     ingredients: { name: string; quantity: string }[]
     instructions: string
   }
+  readOnly?: boolean
 }
 
-export function RecipeModal({ visible, onClose, onSave, initialRecipe }:  Props) {
+export function RecipeModal({ visible, onClose, onSave, initialRecipe, readOnly }:  Props) {
     const { themed } = useAppTheme()
     const safeInitial = initialRecipe && Array.isArray(initialRecipe.ingredients) ? initialRecipe : {
         ingredients: [{ name: "", quantity: "" }],
@@ -49,7 +50,7 @@ export function RecipeModal({ visible, onClose, onSave, initialRecipe }:  Props)
           
                 {/* header */}
                 <View style={{ alignItems: "center", marginBottom: 12, marginTop: 20 }}>
-                    <Text text="add recipe" style={themed($headerTitle)} />
+                    <Text text="recipe" style={themed($headerTitle)} />
                     <Pressable onPress={onClose} style={{ position: "absolute", right: 0, top: 0 }}>
                         <MaterialCommunityIcons name="close" size={24} color="white" />
                     </Pressable>
@@ -65,6 +66,7 @@ export function RecipeModal({ visible, onClose, onSave, initialRecipe }:  Props)
                         {/* ingredient name */}
                         <TextField
                             value={ing.name}
+                            editable={!readOnly}
                             onChangeText={(t) => updateIngredient(index, "name", t)}
                             placeholder="ingredient"
                             containerStyle={{ flex: 1 }}
@@ -72,34 +74,39 @@ export function RecipeModal({ visible, onClose, onSave, initialRecipe }:  Props)
                         {/* ingredient quantity */}
                         <TextField
                             value={ing.quantity}
+                            editable={!readOnly}
                             onChangeText={(t) => updateIngredient(index, "quantity", t)}
                             placeholder="qty"
                             containerStyle={{ width: 80 }}
                         />
                         {/* delete ingredient */}
-                        <Pressable
-                            onPress={() => deleteIngredient(index)}
-                            style={{
-                                padding: 4,
-                                justifyContent: "center",
-                                alignItems: "center",
-                            }}
-                        >
-                            <MaterialCommunityIcons name="trash-can-outline" size={22} color="white" />
-                        </Pressable>
-
+                        {!readOnly && (
+                            <Pressable
+                                onPress={() => deleteIngredient(index)}
+                                style={{
+                                    padding: 4,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <MaterialCommunityIcons name="trash-can-outline" size={22} color="white" />
+                            </Pressable>
+                        )}
                       </View>
                     ))}
 
                     {/* add ingredient button */}
-                    <Pressable onPress={addIngredientRow} style={themed($addRow)}>
-                        <Text text="+ add ingredient" style={{ color: "white" }} />
-                    </Pressable>
+                    {!readOnly && (
+                        <Pressable onPress={addIngredientRow} style={themed($addRow)}>
+                            <Text text="+ add ingredient" style={{ color: "white" }} />
+                        </Pressable>
+                    )}
 
                     {/* instructions (text entry box) */}
                     <Text text="instructions" preset="subheading" style={{ color: "white", marginTop: "auto" }} />
                     <TextField
                         value={instructions}
+                        editable={!readOnly}
                         onChangeText={setInstructions}
                         multiline
                         containerStyle={{ height: 120 }}
@@ -108,18 +115,19 @@ export function RecipeModal({ visible, onClose, onSave, initialRecipe }:  Props)
                 </ScrollView>
 
                 {/* save button */}
-                <Button
-                    text="save recipe"
-                    onPress={() => {
-                        const cleanedIngredients = ingredients.filter(
-                            ing => ing.name.trim() !== "" || ing.quantity.trim() !== ""
-                        )
-                        onSave({ ingredients: cleanedIngredients, instructions })
-                    }}
-                    style={{ backgroundColor: "#FF9400", minHeight: 40, marginTop: 12, marginBottom: 20 }}
-                    textStyle={{ color: "white" }}
-                />
-
+                {!readOnly && (
+                    <Button
+                        text="save recipe"
+                        onPress={() => {
+                            const cleanedIngredients = ingredients.filter(
+                                ing => ing.name.trim() !== "" || ing.quantity.trim() !== ""
+                            )
+                            onSave({ ingredients: cleanedIngredients, instructions })
+                        }}
+                        style={{ backgroundColor: "#FF9400", minHeight: 40, marginTop: 12, marginBottom: 20 }}
+                        textStyle={{ color: "white" }}
+                    />
+                )}
             </View>
         </View>
       </Modal>
