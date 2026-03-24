@@ -11,15 +11,21 @@ interface Props {
   visible: boolean
   onClose: () => void
   onSave: (recipe: { ingredients: { name: string; quantity: string }[]; instructions: string }) => void
+  initialRecipe?: {
+    ingredients: { name: string; quantity: string }[]
+    instructions: string
+  }
 }
 
-export function RecipeModal({ visible, onClose, onSave }:  Props) {
+export function RecipeModal({ visible, onClose, onSave, initialRecipe }:  Props) {
     const { themed } = useAppTheme()
-    const [ingredients, setIngredients] = useState([
-        { name: "", quantity: "" }
-    ])
+    const [ingredients, setIngredients] = useState(
+        initialRecipe?.ingredients ?? { name: "", quantity: "" }
+    )
 
-    const [instructions, setInstructions] = useState("")
+    const [instructions, setInstructions] = useState(
+        initialRecipe?.instructions ?? ""
+    )
     const addIngredientRow = () => {
         setIngredients(prev => [...prev, { name: "", quantity: "" }])
     }

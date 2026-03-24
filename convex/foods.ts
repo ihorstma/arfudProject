@@ -173,6 +173,19 @@ const updateFoodArgs = {
   prepTime: v.optional(v.array(v.string())),
   stockStatus: v.optional(v.array(v.string())),
   description: v.optional(v.string()),
+  recipes: v.optional(
+    v.array(
+      v.object({
+        ingredients: v.array(
+          v.object({
+            name: v.string(),
+            quantity: v.string(),
+          })
+        ),
+        instructions: v.string(),
+      })
+    )
+  ),
 }
 
 export const updateFood = mutation({
