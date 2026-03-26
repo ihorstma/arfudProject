@@ -112,11 +112,10 @@ function BackOfCard({ item, onEdit, onViewRecipe }: BackProps) {
         backgroundColor: "#DA68A347",
         borderRadius: 16,
         overflow: "hidden",
-        justifyContent: "space-between",
       }}
     >
       {/* Top content */}
-      <View>
+      <View style={{ flex: 1 }}>
         <Text
           text={item.name}
           style={{
