@@ -10,6 +10,7 @@ import { translate } from "@/i18n/translate"
 import { useAppTheme } from "@/theme/context"
 import { ThemedStyle } from "@/theme/types"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { useArchiveMode  } from "./store/useArchiveMode"
 
 import { Image } from "react-native" 
 import arfudHome from "@/assets/icons/arfudIconsLightMode/arfudHome.png"
@@ -23,11 +24,33 @@ import { useAddFoodTrigger } from "./store/useAddFoodTrigger"
 
 export default function DemoLayout() {
   const setTrigger = useAddFoodTrigger((s) => s.setTrigger)
+  const setArchiveOpen = useArchiveMode(s => s.setArchiveOpen)
   const { bottom } = useSafeAreaInsets()
   const {
     themed,
     theme: { colors },
   } = useAppTheme()
+
+  type SafeFoodsTabIconProps = {
+    focused: boolean
+  }
+
+  function SafeFoodsTabIcon({ focused }: SafeFoodsTabIconProps) {
+    const isArchiveOpen = useArchiveMode(s => s.isArchiveOpen)
+
+    return (
+      <Image
+        source={
+          useArchiveMode.getState().isArchiveOpen
+            ? arfudDinnerBell // archive mode
+            : focused 
+            ? arfudPlus // focused safe mode
+            : arfudDinnerBell // unfocused safe mode
+          }
+        style={{ width: 30, height: 30 }}
+      />
+    )
+  }
 
   return (
   <GestureHandlerRootView style={{ flex: 1 }}>
@@ -71,24 +94,35 @@ export default function DemoLayout() {
           name="food-grid"
           options={{
             tabBarLabel: "safe foods",
-            tabBarIcon: ({ focused }) => (
-              <Image
-                source={focused ? arfudPlus : arfudDinnerBell}
-                style={{ width: 30, height: 30 }}
-              />
-           ),
+            tabBarIcon: ({ focused }) => <SafeFoodsTabIcon focused={focused} />
           }}
           listeners={({ navigation, route }) => ({
           tabPress: (e) => {
             const state = navigation.getState()
             const isFocused =
-            state.index === state.routes.findIndex(({ key }: { key: string }) => key === route.key)
+              state.index === state.routes.findIndex(({ key }: { key: string }) => key === route.key)
 
+            const { isArchiveOpen, setArchiveOpen } = useArchiveMode.getState()
+
+            // case 1 -> we taps this tab while it is already focused
             if (isFocused) {
               e.preventDefault()
-              // this is where we trigger the modal
-              useAddFoodTrigger.getState().setTrigger(true)
+              if (isArchiveOpen) {
+                // if we are in archive mode -> then turn it off
+                setArchiveOpen(false)
+              }
+              else {
+                //if we are not in archive mode -> open the add food modal
+                useAddFoodTrigger.getState().setTrigger(true) // this is where we trigger the modal
+              }
+              return
             }
+             // case 2 -> we tap the tab from another tab, so we always exit archive mode when switching to safe foods
+             const wasUserTap = e.defaultPrevented === false
+
+             if (wasUserTap) {
+              setArchiveOpen(false)
+             }
           },
           })}
     

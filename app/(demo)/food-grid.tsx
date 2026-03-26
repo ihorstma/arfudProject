@@ -24,6 +24,7 @@ import type { Doc, Id } from "@/convex/_generated/dataModel"
 import { useAppTheme } from "@/theme/context"
 import { $styles } from "@/theme/styles"
 import type { ThemedStyle } from "@/theme/types"
+import { useArchiveMode  } from "./store/useArchiveMode"
 
 import SafeFoodsCreateModal from "@/components/CreateNewSafeFoodModal"
 import EditSafeFoodModal from "@/components/EditSafeFoodModal"
@@ -69,6 +70,8 @@ export default function FoodGridScreen() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingFood, setEditingFood] = useState<Doc<"foods"> | null>(null)
   const [viewingRecipe, setViewingRecipe] = useState<Doc<"foods"> | null>(null)
+  const isArchiveOpen = useArchiveMode(s => s.isArchiveOpen)
+  const setArchiveOpen = useArchiveMode(s => s.setArchiveOpen)
 
   const deleteFood = useMutation(api.foods.deleteFood)
   const setInStock = useMutation(api.foods.setInStock)
@@ -103,6 +106,13 @@ export default function FoodGridScreen() {
       height: getRandomHeight(item._id),
     }))
 
+    if (isArchiveOpen) {
+      list = list.filter(item => item.isSafe === false)
+    }
+    else {
+      list = list.filter(item => item.isSafe === true)
+    }
+
     // --- FILTER TAB: Stock ---
     if (topTab === "filter" && stockFilter.length > 0) {
       list = list.filter(item => 
@@ -126,7 +136,7 @@ export default function FoodGridScreen() {
       if (sortMode === "name") return a.name.localeCompare(b.name)
       return b.updatedAt - a.updatedAt
     })
-  }, [rawFoods, topTab, searchQuery, stockFilter, prepFilter, sensoryFilter, sortMode])
+  }, [rawFoods, topTab, searchQuery, stockFilter, prepFilter, sensoryFilter, sortMode, isArchiveOpen])
 
 
   const onRefresh = async () => {
@@ -299,7 +309,7 @@ export default function FoodGridScreen() {
       </View>
     ) : (
       <FlashList
-        key={viewMode}
+        key={viewMode + (isArchiveOpen ? "-archive" : "-safe")}
         data={foods}
         numColumns={viewMode === "grid" ? 2 : 1}
         renderItem={({ item }) => (
