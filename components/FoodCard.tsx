@@ -6,6 +6,7 @@ import { Text } from "./Text"
 import { Button } from "./Button"
 import type { Doc } from "@/convex/_generated/dataModel"
 import { availableTags, prepTimeTags, stockTags } from "@/components/FoodTagsInfo/FoodTags"
+import { max } from "date-fns"
 
 function getTagInfo(label: string) {
   return (
@@ -89,7 +90,7 @@ type BackProps = {
 function BackOfCard({ item, onEdit, onViewRecipe }: BackProps) {
 
   let maxVisibleTags = 3
-  if (item.height > 250) maxVisibleTags = 4
+  if (item.height > 240) maxVisibleTags = 4
   if (item.height > 260) maxVisibleTags = 5
   if (item.height > 370) maxVisibleTags = 6
 

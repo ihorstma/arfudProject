@@ -43,7 +43,7 @@ const getRandomHeight = (id: string) => {
     hash = (hash << 5) - hash + id.charCodeAt(i)
     hash |= 0
   }
-  return 180 + (Math.abs(hash) % 140)
+  return 200 + (Math.abs(hash) % 140)
 }
 
 const getLabel = (mode: SortMode) => {
