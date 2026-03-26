@@ -48,12 +48,14 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
   const [showRecipeModal, setShowRecipeModal] = useState(false)
   const [recipes, setRecipes] = useState([])
 
+  // take every element in prev and copy into a new array, then add tag at the end of it
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev,tag]
     )
   }
 
+  // if tag is toggled then untoggle, else toggle
   const togglePrepTag = (tag: string) => {
     setSelectedPrepTags(prev =>
       prev.includes(tag) ? [] : [tag]
@@ -81,7 +83,6 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
     }
 
     const parsedInStock = selectedStockTags[0] ?? null
-
 
     setIsSaving(true)
     try {

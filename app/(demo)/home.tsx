@@ -16,13 +16,16 @@ import {
 } from "react-native"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { useRouter } from "expo-router"
 
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { useAppTheme } from "@/theme/context"
 import { $styles } from "@/theme/styles"
 import type { ThemedStyle } from "@/theme/types"
+import { useArchiveMode } from "./store/useArchiveMode"
 
+const router = useRouter()
 const { width } = Dimensions.get("window")
 const MENU_WIDTH = width * 0.8
 
@@ -32,6 +35,7 @@ export default function HomeScreen() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAboutOpen, setIsAboutOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const setArchiveOpen = useArchiveMode(s => s.setArchiveOpen)
   const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current
 
   // A more robust Donut chart placeholder
@@ -228,6 +232,18 @@ export default function HomeScreen() {
             <TouchableOpacity style={themed($menuItemRow)}>
               <MaterialCommunityIcons name="card-account-details-outline" size={24} color="white" />
               <Text text="view profile" style={themed($menuItemText)} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={themed($menuItemRow)}
+              onPress={() => {
+                setIsMenuOpen(false)
+                setArchiveOpen(true)
+                router.push("/food-grid")
+              }}
+            >
+              <MaterialCommunityIcons name="book-outline" size={24} color="white" />
+              <Text text="food archive" style={themed($menuItemText)} />
             </TouchableOpacity>
 
             <TouchableOpacity style={themed($menuItemRow)}>
