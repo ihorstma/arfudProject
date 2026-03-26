@@ -69,6 +69,9 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
   const resetForm = () => {
     setName("")
     setImageUrl("")
+    setSelectedPrepTags([])
+    setSelectedStockTags([])
+    setSelectedTags([])
   }
 
   const handleSave = async () => {
