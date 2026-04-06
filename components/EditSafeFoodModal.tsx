@@ -319,7 +319,8 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
           visible={showDeleteConfirm}
           onCancel={() => setShowDeleteConfirm(false)}
           onDelete={handleDelete}
-          onArchive={handleArchive}
+          onArchive={handleArchiveToggle}
+          isArchived={isArchived}
         />
       )}
 

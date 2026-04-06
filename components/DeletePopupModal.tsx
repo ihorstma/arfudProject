@@ -9,6 +9,7 @@ interface Props {
   onCancel: () => void
   onDelete: () => void
   onArchive: () => void
+  isArchived: boolean
 }
 
 export default function DeletePopupModal({
@@ -16,6 +17,7 @@ export default function DeletePopupModal({
   onCancel,
   onDelete,
   onArchive,
+  isArchived,
 }: Props) {
   const { themed } = useAppTheme()
 
@@ -83,7 +85,7 @@ export default function DeletePopupModal({
 
           {/* Move to archive instead */}
           <Button
-            text="move to archive instead"
+            text={isArchived ? "unarchive instead" : "move to archive instead"}
             onPress={onArchive}
             style={{
               backgroundColor: "#775587",
