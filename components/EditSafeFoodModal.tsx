@@ -51,6 +51,11 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
     instructions: ""
   })
 
+  const isFormValid = 
+    name.trim().length > 0 &&
+    selectedPrepTags.length > 0 &&
+    selectedStockTags.length > 0
+
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev,tag]
@@ -256,7 +261,7 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
             <Button 
               text="save changes" 
               onPress={handleSave} 
-              disabled={isSaving} 
+              disabled={isSaving || !isFormValid} 
               preset="filled"
               style={{ backgroundColor: "#FF9400", minHeight: 40, }}
               textStyle={{ color: "white" }}
