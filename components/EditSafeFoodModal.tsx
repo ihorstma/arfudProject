@@ -44,12 +44,21 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
   )
   const [isSaving, setIsSaving] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const isArchived = food.isSafe === false
 
   const [showRecipeModal, setShowRecipeModal] = useState(false)
   const [recipe, setRecipe] = useState(food.recipes?.[0] ?? {
     ingredients: [{ name: "", quantity: ""}],
     instructions: ""
   })
+
+  const handleArchiveToggle = async () => {
+    await updateFood({
+      id: food._id,
+      isSafe : isArchived ? true : false, // toggle from true to false / false to true
+    })
+    onClose()
+  }
 
   const isFormValid = 
     name.trim().length > 0 &&
@@ -279,7 +288,7 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
            }}
           >
           <Button
-            text="move to archive"
+            text={isArchived ? "unarchive" : "move to archive"}
             style={{
               flex: 1,
               minHeight: 36,
@@ -287,7 +296,7 @@ export default function EditSafeFoodModal({ visible, onClose, food }: EditFoodMo
               paddingVertical: 6,
             }}
             textStyle={{ color: "white" }}
-            onPress={handleArchive}
+            onPress={handleArchiveToggle}
         />
 
         <Button
