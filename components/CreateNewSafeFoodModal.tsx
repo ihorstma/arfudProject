@@ -48,6 +48,11 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
   const [showRecipeModal, setShowRecipeModal] = useState(false)
   const [recipes, setRecipes] = useState([])
 
+  const isFormValid = 
+    name.trim().length > 0 &&
+    selectedPrepTags.length > 0 &&
+    selectedStockTags.length > 0
+
   // take every element in prev and copy into a new array, then add tag at the end of it
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
@@ -91,9 +96,9 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
         isSafe: true,
         inStock: parsedInStock,
         imageUrl: imageUrl.trim() || undefined,
-        tags: selectedTags,
-        prepTime: selectedPrepTags,
-        recipes: recipes,
+        tags: selectedTags ?? [],
+        prepTime: selectedPrepTags ?? [],
+        recipes: recipes ?? [],
       })
       resetForm()
       onClose()
@@ -244,7 +249,7 @@ export default function SafeFoodsCreateModal({ visible, onClose } : addFoodModal
             <Button 
               text="add new safe food" 
               onPress={handleSave} 
-              disabled={isSaving} 
+              disabled={isSaving || !isFormValid} 
               preset="filled"
               style={{ backgroundColor: "#FF9400", minHeight: 40, }}
               textStyle={{ color: "white" }}
